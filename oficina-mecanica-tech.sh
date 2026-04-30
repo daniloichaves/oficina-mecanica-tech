@@ -197,13 +197,13 @@ trivy() {
     fi
     
     print_info "Executando análise Trivy no Dockerfile..."
-    trivy config --severity HIGH,CRITICAL Dockerfile
+    /opt/homebrew/bin/trivy config --severity HIGH,CRITICAL Dockerfile || print_warning "Falha na análise do Dockerfile"
     
     print_info "Executando análise Trivy no docker-compose.yml..."
-    trivy config --severity HIGH,CRITICAL docker-compose.yml
+    /opt/homebrew/bin/trivy config --severity HIGH,CRITICAL docker-compose.yml || print_warning "Falha na análise do docker-compose.yml"
     
     print_info "Executando análise Trivy no código fonte..."
-    trivy fs --severity HIGH,CRITICAL --skip-dirs target .
+    /opt/homebrew/bin/trivy fs --severity HIGH,CRITICAL --skip-dirs target . || print_warning "Falha na análise do código fonte"
     
     print_success "Análise Trivy concluída!"
 }
