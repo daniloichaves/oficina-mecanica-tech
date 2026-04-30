@@ -159,8 +159,6 @@
                                 <rule>
                                     <element>CLASS</element>
                                     <includes>
-                                        <include>com.oficina.mecanica.domain.entities.OrdemServico</include>
-                                        <include>com.oficina.mecanica.domain.entities.Peca</include>
                                         <include>com.oficina.mecanica.domain.valueobjects.CpfCnpj</include>
                                         <include>com.oficina.mecanica.domain.valueobjects.Placa</include>
                                     </includes>
@@ -176,6 +174,11 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.11.0.3922</version>
             </plugin>
         </plugins>
     </build>
