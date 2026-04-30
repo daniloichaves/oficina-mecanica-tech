@@ -110,23 +110,102 @@ status() {
     docker-compose ps
 }
 
+# Função sonar: Inicia SonarQube e executa análise
+sonar() {
+    print_info "Iniciando SonarQube..."
+    docker-compose -f docker-compose.sonar.yml up -d
+    
+    print_info "Aguardando SonarQube ficar pronto (isso pode levar alguns minutos)..."
+    
+    # Aguarda SonarQube estar pronto
+    local max_attempts=60
+    local attempt=0
+    
+    while [ $attempt -lt $max_attempts ]; do
+        if docker exec oficina-sonarqube curl -f -s http://localhost:9000/api/system/status > /dev/null 2>&1; then
+            print_success "SonarQube está pronto!"
+            break
+        fi
+        attempt=$((attempt + 1))
+        echo -n "."
+        sleep 5
+    done
+    echo
+    
+    if [ $attempt -eq $max_attempts ]; then
+        print_error "SonarQube não ficou pronto a tempo. Verifique os logs com: docker-compose -f docker-compose.sonar.yml logs"
+        exit 1
+    fi
+    
+    print_info "Criando usuário admin2..."
+    docker exec oficina-sonarqube curl -X POST -u admin:admin \
+        -F "login=admin2" \
+        -F "name=Admin2" \
+        -F "password=admin2" \
+        http://localhost:9000/api/users/create > /dev/null 2>&1
+    
+    if [ $? -eq 0 ]; then
+        print_success "Usuário admin2 criado com sucesso!"
+    else
+        print_warning "Não foi possível criar o usuário admin2 (pode já existir)."
+    fi
+    
+    print_info "Executando análise SonarQube..."
+    
+    # Verifica se o arquivo sonar-project.properties existe, senão cria configuração via linha de comando
+    if [ ! -f "sonar-project.properties" ]; then
+        print_info "Configurando análise via parâmetros..."
+        mvn sonar:sonar \
+            -Dsonar.host.url=http://localhost:9000 \
+            -Dsonar.login=admin \
+            -Dsonar.password=admin \
+            -Dsonar.projectKey=oficina-mecanica \
+            -Dsonar.projectName=Oficina-Mecanica \
+            -Dsonar.projectVersion=1.0.0
+    else
+        mvn sonar:sonar
+    fi
+    
+    print_success "Análise concluída!"
+    print_info "Acesse o dashboard em: http://localhost:9000"
+    print_info "Credenciais padrão: admin / admin"
+}
+
+# Função sonar-stop: Para o SonarQube
+sonar_stop() {
+    print_info "Parando SonarQube..."
+    docker-compose -f docker-compose.sonar.yml down
+    
+    print_success "SonarQube parado com sucesso!"
+}
+
+# Função sonar-logs: Mostra logs do SonarQube
+sonar_logs() {
+    print_info "Mostrando logs do SonarQube (Ctrl+C para sair)..."
+    docker-compose -f docker-compose.sonar.yml logs -f
+}
+
 # Função help: Mostra ajuda
 help() {
     echo "Uso: $0 <comando>"
     echo ""
     echo "Comandos disponíveis:"
-    echo "  start     - Inicia os containers Docker"
-    echo "  stop      - Para os containers Docker"
-    echo "  restart   - Reinicia os containers Docker"
-    echo "  logs      - Mostra logs de todos os containers (ou: logs <serviço>)"
-    echo "  status    - Mostra o status dos containers"
-    echo "  clean     - Para e remove containers, volumes e limpa o projeto"
-    echo "  help      - Mostra esta mensagem de ajuda"
+    echo "  start       - Inicia os containers Docker"
+    echo "  stop        - Para os containers Docker"
+    echo "  restart     - Reinicia os containers Docker"
+    echo "  logs        - Mostra logs de todos os containers (ou: logs <serviço>)"
+    echo "  status      - Mostra o status dos containers"
+    echo "  clean       - Para e remove containers, volumes e limpa o projeto"
+    echo "  sonar       - Inicia SonarQube e executa análise do código"
+    echo "  sonar-stop  - Para o SonarQube"
+    echo "  sonar-logs  - Mostra logs do SonarQube"
+    echo "  help        - Mostra esta mensagem de ajuda"
     echo ""
     echo "Exemplos:"
     echo "  $0 start"
     echo "  $0 logs app"
     echo "  $0 logs postgres"
+    echo "  $0 sonar"
 }
 
 # Verifica se o Docker e Docker Compose estão instalados
@@ -163,6 +242,15 @@ case "$1" in
         ;;
     clean)
         clean
+        ;;
+    sonar)
+        sonar
+        ;;
+    sonar-stop)
+        sonar_stop
+        ;;
+    sonar-logs)
+        sonar_logs
         ;;
     help|--help|-h)
         help
