@@ -185,6 +185,29 @@ sonar_logs() {
     docker-compose -f docker-compose.sonar.yml logs -f
 }
 
+# Função trivy: Executa análise de segurança com Trivy
+trivy() {
+    # Verifica se o Trivy está instalado
+    if ! command -v trivy &> /dev/null; then
+        print_error "Trivy não está instalado."
+        print_info "Para instalar o Trivy, execute:"
+        print_info "  brew install trivy  (macOS)"
+        print_info "  ou visite: https://aquasecurity.github.io/trivy/latest/getting-started/installation/"
+        exit 1
+    fi
+    
+    print_info "Executando análise Trivy no Dockerfile..."
+    trivy config --severity HIGH,CRITICAL Dockerfile
+    
+    print_info "Executando análise Trivy no docker-compose.yml..."
+    trivy config --severity HIGH,CRITICAL docker-compose.yml
+    
+    print_info "Executando análise Trivy no código fonte..."
+    trivy fs --severity HIGH,CRITICAL --skip-dirs target .
+    
+    print_success "Análise Trivy concluída!"
+}
+
 # Função help: Mostra ajuda
 help() {
     echo "Uso: $0 <comando>"
@@ -199,6 +222,7 @@ help() {
     echo "  sonar       - Inicia SonarQube e executa análise do código"
     echo "  sonar-stop  - Para o SonarQube"
     echo "  sonar-logs  - Mostra logs do SonarQube"
+    echo "  trivy       - Executa análise de segurança com Trivy"
     echo "  help        - Mostra esta mensagem de ajuda"
     echo ""
     echo "Exemplos:"
@@ -206,6 +230,7 @@ help() {
     echo "  $0 logs app"
     echo "  $0 logs postgres"
     echo "  $0 sonar"
+    echo "  $0 trivy"
 }
 
 # Verifica se o Docker e Docker Compose estão instalados
@@ -251,6 +276,9 @@ case "$1" in
         ;;
     sonar-logs)
         sonar_logs
+        ;;
+    trivy)
+        trivy
         ;;
     help|--help|-h)
         help
