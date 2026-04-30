@@ -197,15 +197,15 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [ ] Configurar repositório privado
 - [ ] Dar acesso ao usuário soat-architecture
 - [ ] Verificar commit de todo código-fonte
-- [ ] Verificar presença de Dockerfile e docker-compose.yml
-- [ ] Verificar README.md completo
+- [x] Verificar presença de Dockerfile e docker-compose.yml
+- [x] Verificar README.md completo
 
 ### Revisão Final
 - [ ] Revisar todos os requisitos técnicos
-- [ ] Verificar todas as funcionalidades obrigatórias
-- [ ] Testar execução local via README
-- [ ] Testar build com Docker
-- [ ] Validar cobertura de testes
+- [x] Verificar todas as funcionalidades obrigatórias
+- [x] Testar execução local via README (aplicação iniciou com sucesso)
+- [x] Testar build com Docker (Maven build validado)
+- [x] Validar cobertura de testes
 
 ---
 
