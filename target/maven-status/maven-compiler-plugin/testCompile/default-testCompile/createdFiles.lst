@@ -1,0 +1,4 @@
+com/oficina/mecanica/domain/entities/PecaTest.class
+com/oficina/mecanica/domain/entities/OrdemServicoTest.class
+com/oficina/mecanica/domain/valueobjects/PlacaTest.class
+com/oficina/mecanica/domain/valueobjects/CpfCnpjTest.class
