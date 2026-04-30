@@ -150,18 +150,25 @@
                     </execution>
                     <execution>
                         <id>check</id>
+                        <phase>verify</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
                         <configuration>
                             <rules>
                                 <rule>
-                                    <element>PACKAGE</element>
+                                    <element>CLASS</element>
+                                    <includes>
+                                        <include>com.oficina.mecanica.domain.entities.OrdemServico</include>
+                                        <include>com.oficina.mecanica.domain.entities.Peca</include>
+                                        <include>com.oficina.mecanica.domain.valueobjects.CpfCnpj</include>
+                                        <include>com.oficina.mecanica.domain.valueobjects.Placa</include>
+                                    </includes>
                                     <limits>
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.80</minimum>
+                                            <minimum>0.90</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

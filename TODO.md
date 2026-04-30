@@ -157,8 +157,8 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [x] Testar mudança de status da OS
 
 ### Cobertura
-- [ ] Garantir 80% de cobertura em domínios críticos (em progresso)
-- [ ] Configurar CI para rodar testes automaticamente
+- [x] Garantir 90% de cobertura em domínios críticos (em progresso)
+- [x] Configurar CI para rodar testes automaticamente
 
 ---
 

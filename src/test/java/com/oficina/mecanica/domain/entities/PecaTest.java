@@ -43,4 +43,23 @@ class PecaTest {
         peca.aumentarEstoque(3);
         assertEquals(8, peca.getQuantidadeEstoque());
     }
+
+    @Test
+    void deveInicializarDatasNoOnCreate() {
+        Peca peca = new Peca();
+
+        peca.onCreate();
+
+        assertNotNull(peca.getDataCadastro());
+        assertNotNull(peca.getDataAtualizacao());
+    }
+
+    @Test
+    void deveAtualizarDataNoOnUpdate() {
+        Peca peca = new Peca();
+
+        peca.onUpdate();
+
+        assertNotNull(peca.getDataAtualizacao());
+    }
 }
