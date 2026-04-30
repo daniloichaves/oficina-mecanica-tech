@@ -130,6 +130,35 @@ test() {
     fi
 }
 
+# Função coverage: Verifica a cobertura de testes
+coverage() {
+    print_info "Executando testes e gerando relatório de cobertura..."
+    
+    # Verifica se o Maven está instalado
+    if ! command -v mvn &> /dev/null; then
+        print_error "Maven não está instalado."
+        exit 1
+    fi
+    
+    mvn clean verify
+    
+    if [ $? -eq 0 ]; then
+        print_success "Testes executados e relatório de cobertura gerado!"
+        print_info "Relatório Jacoco: target/site/jacoco/index.html"
+        
+        # Verifica se o relatório foi gerado
+        if [ -f "target/site/jacoco/index.html" ]; then
+            print_info "Abrindo relatório no navegador..."
+            open target/site/jacoco/index.html
+        else
+            print_warning "Relatório não encontrado."
+        fi
+    else
+        print_error "Alguns testes falharam."
+        exit 1
+    fi
+}
+
 # Função sonar: Inicia SonarQube e executa análise
 sonar() {
     print_info "Iniciando SonarQube..."
@@ -240,6 +269,7 @@ help() {
     echo "  status      - Mostra o status dos containers"
     echo "  clean       - Para e remove containers, volumes e limpa o projeto"
     echo "  test        - Executa os testes do projeto"
+    echo "  coverage    - Executa testes e gera relatório de cobertura Jacoco"
     echo "  sonar       - Inicia SonarQube e executa análise do código"
     echo "  sonar-stop  - Para o SonarQube"
     echo "  sonar-logs  - Mostra logs do SonarQube"
@@ -251,6 +281,7 @@ help() {
     echo "  $0 logs app"
     echo "  $0 logs postgres"
     echo "  $0 test"
+    echo "  $0 coverage"
     echo "  $0 sonar"
     echo "  $0 trivy"
 }
@@ -292,6 +323,9 @@ case "$1" in
         ;;
     test)
         test
+        ;;
+    coverage)
+        coverage
         ;;
     sonar)
         sonar
