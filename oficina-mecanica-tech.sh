@@ -110,6 +110,26 @@ status() {
     docker-compose ps
 }
 
+# Função test: Executa os testes do projeto
+test() {
+    print_info "Executando testes do projeto..."
+    
+    # Verifica se o Maven está instalado
+    if ! command -v mvn &> /dev/null; then
+        print_error "Maven não está instalado."
+        exit 1
+    fi
+    
+    mvn clean test
+    
+    if [ $? -eq 0 ]; then
+        print_success "Testes executados com sucesso!"
+    else
+        print_error "Alguns testes falharam."
+        exit 1
+    fi
+}
+
 # Função sonar: Inicia SonarQube e executa análise
 sonar() {
     print_info "Iniciando SonarQube..."
@@ -219,6 +239,7 @@ help() {
     echo "  logs        - Mostra logs de todos os containers (ou: logs <serviço>)"
     echo "  status      - Mostra o status dos containers"
     echo "  clean       - Para e remove containers, volumes e limpa o projeto"
+    echo "  test        - Executa os testes do projeto"
     echo "  sonar       - Inicia SonarQube e executa análise do código"
     echo "  sonar-stop  - Para o SonarQube"
     echo "  sonar-logs  - Mostra logs do SonarQube"
@@ -229,6 +250,7 @@ help() {
     echo "  $0 start"
     echo "  $0 logs app"
     echo "  $0 logs postgres"
+    echo "  $0 test"
     echo "  $0 sonar"
     echo "  $0 trivy"
 }
@@ -267,6 +289,9 @@ case "$1" in
         ;;
     clean)
         clean
+        ;;
+    test)
+        test
         ;;
     sonar)
         sonar
