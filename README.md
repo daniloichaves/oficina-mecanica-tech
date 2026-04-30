@@ -272,6 +272,12 @@ oficina-mecanica/
 
 Este projeto foi desenvolvido como parte do Tech Challenge da fase.
 
+## Colaboradores
+
+Danilo Ischiavolini Chaves
+Rodrigo Dias Bragantini 
+William de Oliveira Almeida
+
 ## Licença
 
 Projeto acadêmico - Tech Challenge
