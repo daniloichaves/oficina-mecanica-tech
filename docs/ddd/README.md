@@ -4,6 +4,12 @@ Documentação de Domínio do MVP de back-end para o sistema integrado de atendi
 
 > **Nota sobre a entrega "Miro ou equivalente"**: optamos por versionar a documentação DDD diretamente no repositório, em Markdown + Mermaid, garantindo rastreabilidade junto ao código, renderização nativa no GitHub e revisão por Pull Request. Esta pasta é o equivalente ao board do Miro.
 
+## Colaboradores
+
+- **Danilo Ischiavolini Chaves**
+- **Rodrigo Dias Bragantini**
+- **William de Oliveira Almeida**
+
 ## Como ler esta documentação
 
 Recomendamos ler na ordem abaixo, do mais amplo (visão estratégica) ao mais detalhado (modelo de implementação):
@@ -37,6 +43,54 @@ Seguimos a notação clássica de Alberto Brandolini, mapeando as cores do post-
 - ✅ Diagramas DDD (Context Map, Aggregates, Sequence, State)
 - ✅ Linguagem Ubíqua consolidada
 - ✅ Mapeamento Use Case → Service → Endpoint REST
+
+## Arquitetura
+
+### Camadas DDD
+
+```mermaid
+flowchart TB
+    UI["Presentation\nControllers + DTOs"]:::ui
+    APP["Application\nServices / Use Cases"]:::app
+    DOM["Domain\nEntities, VOs, Aggregates"]:::dom
+    INF["Infrastructure\nJPA Repositories, Config, Security"]:::inf
+
+    UI --> APP --> DOM
+    INF -."implementa portas de".-> DOM
+    UI -."depende de DTOs de".-> APP
+
+    classDef ui  fill:#E599F7,stroke:#862E9C,color:#000
+    classDef app fill:#FFE066,stroke:#F08C00,color:#000
+    classDef dom fill:#FFA8A8,stroke:#C92A2A,color:#000
+    classDef inf fill:#74C0FC,stroke:#1864AB,color:#000
+```
+
+### Arquitetura de Deploy
+
+```mermaid
+flowchart LR
+    CLIENT["Cliente HTTP\n(Postman / Frontend)"]:::ext
+
+    subgraph DOCKER["Docker Compose"]
+        direction TB
+        APP["Spring Boot 3.2\nJava 21\nPorta 8080"]:::app
+        DB[("PostgreSQL 16\nPorta 5432")]:::db
+        APP -- "JPA / Hibernate" --> DB
+    end
+
+    CLIENT -- "REST + JWT" --> APP
+
+    subgraph SECURITY["Segurança"]
+        JWT["Spring Security\n+ jjwt 0.12.5"]:::sec
+    end
+
+    APP -. "autentica via" .-> JWT
+
+    classDef ext fill:#D0BFFF,stroke:#7048E8,color:#000
+    classDef app fill:#FFE066,stroke:#F08C00,color:#000
+    classDef db  fill:#74C0FC,stroke:#1864AB,color:#000
+    classDef sec fill:#FFA8A8,stroke:#C92A2A,color:#000
+```
 
 ## Referências do código
 
