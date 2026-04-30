@@ -10,11 +10,11 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 ## Fase 1 - Planejamento e Arquitetura
 
 ### Documentação DDD
-- [ ] Criar Event Storming completo do fluxo de criação e acompanhamento da OS
-- [ ] Criar Event Storming completo do fluxo de gestão de peças e insumos
-- [ ] Definir diagramas DDD conforme disciplina
-- [ ] Estabelecer Linguagem Ubíqua do domínio
-- [ ] Documentar no Miro ou equivalente
+- [x] Criar Event Storming completo do fluxo de criação e acompanhamento da OS
+- [x] Criar Event Storming completo do fluxo de gestão de peças e insumos
+- [x] Definir diagramas DDD conforme disciplina
+- [x] Estabelecer Linguagem Ubíqua do domínio
+- [x] Documentar no Miro ou equivalente — versionado em `docs/ddd/` (Markdown + Mermaid, equivalente ao Miro conforme rubrica "ou equivalente")
 
 ### Escolha Tecnológica
 - [x] Definir banco de dados (com justificativa) - PostgreSQL 16 (relacional, open-source, suporte a transações)
