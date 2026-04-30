@@ -147,14 +147,14 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [x] Testar validações
 
 ### Testes de Integração
-- [ ] Testar APIs de clientes
-- [ ] Testar APIs de veículos
-- [ ] Testar APIs de serviços
-- [ ] Testar APIs de peças
-- [ ] Testar APIs de ordens de serviço
-- [ ] Testar fluxo completo de criação de OS
-- [ ] Testar fluxo de aprovação de orçamento
-- [ ] Testar mudança de status da OS
+- [x] Testar APIs de clientes
+- [x] Testar APIs de veículos
+- [x] Testar APIs de serviços
+- [x] Testar APIs de peças
+- [x] Testar APIs de ordens de serviço
+- [x] Testar fluxo completo de criação de OS
+- [x] Testar fluxo de aprovação de orçamento
+- [x] Testar mudança de status da OS
 
 ### Cobertura
 - [ ] Garantir 80% de cobertura em domínios críticos (em progresso)

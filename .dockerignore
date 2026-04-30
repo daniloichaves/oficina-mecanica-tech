@@ -1,0 +1,36 @@
+# Git and CI metadata
+.git
+.gitignore
+.github
+
+# Build outputs
+target
+out
+build
+
+# IDE and editor files
+.idea
+.vscode
+*.iml
+
+# OS / local noise
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+
+# Docs and local notes not required for image build
+TODO.md
+*.pdf

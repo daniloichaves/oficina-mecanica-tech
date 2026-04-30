@@ -1,0 +1,38 @@
+/target/
+/out/
+/build/
+
+# Maven wrapper logs and temp files
+/.mvn/wrapper/maven-wrapper.jar.backup
+
+# Java / JVM
+*.class
+*.log
+hs_err_pid*
+replay_pid*
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+
+# IDE / editor
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+.factorypath
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# OS files
+.DS_Store
+Thumbs.db
