@@ -122,7 +122,7 @@ sonar() {
     local attempt=0
     
     while [ $attempt -lt $max_attempts ]; do
-        if docker exec oficina-sonarqube curl -f -s http://localhost:9000/api/system/status > /dev/null 2>&1; then
+        if curl -f -s http://localhost:9000/api/system/status > /dev/null 2>&1; then
             print_success "SonarQube está pronto!"
             break
         fi
@@ -138,7 +138,7 @@ sonar() {
     fi
     
     print_info "Criando usuário admin2..."
-    docker exec oficina-sonarqube curl -X POST -u admin:admin \
+    curl -X POST -u admin:admin \
         -F "login=admin2" \
         -F "name=Admin2" \
         -F "password=admin2" \
