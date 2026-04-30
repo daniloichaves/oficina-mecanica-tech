@@ -139,6 +139,7 @@ docker-compose down
 ### Clientes
 - `POST /api/clientes` - Criar cliente
 - `GET /api/clientes` - Listar todos
+- `GET /api/clientes/paginado` - Listar com paginação (padrão: page=0, size=10)
 - `GET /api/clientes/{id}` - Buscar por ID
 - `GET /api/clientes/cpf/{cpfCnpj}` - Buscar por CPF/CNPJ
 - `PUT /api/clientes/{id}` - Atualizar
@@ -147,6 +148,7 @@ docker-compose down
 ### Veículos
 - `POST /api/veiculos` - Criar veículo
 - `GET /api/veiculos` - Listar todos
+- `GET /api/veiculos/paginado` - Listar com paginação (padrão: page=0, size=10)
 - `GET /api/veiculos/{id}` - Buscar por ID
 - `GET /api/veiculos/placa/{placa}` - Buscar por placa
 - `GET /api/veiculos/cliente/{clienteId}` - Listar por cliente
@@ -156,22 +158,25 @@ docker-compose down
 ### Serviços
 - `POST /api/servicos` - Criar serviço
 - `GET /api/servicos` - Listar todos
+- `GET /api/servicos/paginado` - Listar com paginação (padrão: page=0, size=10)
 - `GET /api/servicos/{id}` - Buscar por ID
 - `PUT /api/servicos/{id}` - Atualizar
 - `DELETE /api/servicos/{id}` - Deletar
 
 ### Peças
-- `POST /api/pecas` - Criar peça
+- `POST /api/pecas` - Criar peça/insumo
 - `GET /api/pecas` - Listar todas
+- `GET /api/pecas/paginado` - Listar com paginação (padrão: page=0, size=10)
 - `GET /api/pecas/{id}` - Buscar por ID
-- `GET /api/pecas/estoque-baixo?limite=5` - Listar estoque baixo
+- `GET /api/pecas/estoque-baixo` - Listar estoque baixo
 - `PUT /api/pecas/{id}` - Atualizar
-- `PATCH /api/pecas/{id}/estoque?quantidade=10` - Atualizar estoque
+- `PATCH /api/pecas/{id}/estoque` - Atualizar estoque
 - `DELETE /api/pecas/{id}` - Deletar
 
 ### Ordens de Serviço
 - `POST /api/ordens-servico` - Criar OS
 - `GET /api/ordens-servico` - Listar todas
+- `GET /api/ordens-servico/paginado` - Listar com paginação (padrão: page=0, size=10)
 - `GET /api/ordens-servico/{id}` - Buscar por ID
 - `GET /api/ordens-servico/cliente/{clienteId}` - Listar por cliente
 - `GET /api/ordens-servico/veiculo/{veiculoId}` - Listar por veículo

@@ -8,6 +8,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,6 +39,13 @@ public class PecaController {
     @Operation(summary = "Listar todas as peças")
     public ResponseEntity<List<PecaDTO>> listarTodos() {
         return ResponseEntity.ok(pecaService.listarTodos());
+    }
+    
+    @GetMapping("/paginado")
+    @Operation(summary = "Listar peças com paginação")
+    public ResponseEntity<Page<PecaDTO>> listarTodosPaginado(
+            @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        return ResponseEntity.ok(pecaService.listarTodos(pageable));
     }
     
     @GetMapping("/estoque-baixo")

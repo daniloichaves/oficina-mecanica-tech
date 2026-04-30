@@ -8,6 +8,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,6 +45,13 @@ public class VeiculoController {
     @Operation(summary = "Listar todos os veículos")
     public ResponseEntity<List<VeiculoDTO>> listarTodos() {
         return ResponseEntity.ok(veiculoService.listarTodos());
+    }
+    
+    @GetMapping("/paginado")
+    @Operation(summary = "Listar veículos com paginação")
+    public ResponseEntity<Page<VeiculoDTO>> listarTodosPaginado(
+            @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        return ResponseEntity.ok(veiculoService.listarTodos(pageable));
     }
     
     @GetMapping("/cliente/{clienteId}")
