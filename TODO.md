@@ -177,10 +177,10 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [ ] Verificar aplicação da linguagem ubíqua
 
 ### Relatório de Vulnerabilidades
-- [ ] Executar scan de segurança no código
-- [ ] Analisar resultados
-- [ ] Documentar vulnerabilidades encontradas
-- [ ] Documentar mitigações aplicadas
+- [x] Executar scan de segurança no código (Trivy + SonarQube)
+- [x] Analisar resultados (5 findings: 2 CRITICAL, 3 HIGH)
+- [x] Documentar vulnerabilidades encontradas (docs/RELATORIO-SEGURANCA-GERENCIAL.md)
+- [x] Documentar mitigações aplicadas (plano de ação no relatório)
 
 ### Documento de Entrega (PDF)
 - [ ] Criar PDF com nome do grupo

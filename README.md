@@ -243,6 +243,42 @@ curl -X POST http://localhost:8080/api/ordens-servico \
 | JWT_SECRET | Secret para JWT | oficinaMecanicaSecretKey... |
 | JWT_EXPIRATION | Expiração do token (ms) | 86400000 |
 
+## Pipeline de Segurança e Qualidade
+
+O projeto inclui um pipeline automatizado de análise de segurança e qualidade via script:
+
+```bash
+./oficina-mecanica-tech.sh security
+```
+
+Este comando executa sequencialmente:
+
+| Etapa | Ferramenta | O que verifica |
+|-------|-----------|---------------|
+| 1 | **Trivy** | Vulnerabilidades no Dockerfile, docker-compose e código |
+| 2 | **JaCoCo** | Cobertura de testes (mínimo 90% em domínios críticos) |
+| 3 | **SonarQube** | Qualidade de código, duplicação e code smells |
+| 4 | **Consolidação** | Gera `target/security/security-summary.md` com evidências |
+
+### Outros comandos disponíveis
+
+```bash
+./oficina-mecanica-tech.sh trivy     # Apenas scan de segurança
+./oficina-mecanica-tech.sh sonar     # Apenas análise SonarQube
+./oficina-mecanica-tech.sh coverage  # Apenas cobertura JaCoCo
+./oficina-mecanica-tech.sh help      # Lista todos os comandos
+```
+
+### Relatório de Vulnerabilidades
+
+O relatório gerencial de segurança está disponível em:
+- `docs/RELATORIO-SEGURANCA-GERENCIAL.md`
+
+Inclui:
+- Vulnerabilidades HIGH/CRITICAL encontradas
+- Plano de ação com prioridades
+- Evidências das ferramentas (Trivy, JaCoCo, SonarQube)
+
 ## Testes
 
 ```bash
