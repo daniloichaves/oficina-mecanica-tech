@@ -33,16 +33,24 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+docker_compose() {
+    if command -v docker-compose &> /dev/null; then
+        docker-compose "$@"
+    else
+        docker compose "$@"
+    fi
+}
+
 # Função start: Inicia os containers Docker
 start() {
     print_info "Iniciando containers Docker..."
-    docker-compose up -d
+    docker_compose up -d
     
     print_info "Aguardando serviços ficarem prontos..."
     sleep 5
     
     print_info "Verificando status dos containers..."
-    docker-compose ps
+    docker_compose ps
     
     print_success "Containers iniciados com sucesso!"
     print_info "API disponível em: http://localhost:8080"
@@ -53,7 +61,7 @@ start() {
 # Função stop: Para os containers Docker
 stop() {
     print_info "Parando containers Docker..."
-    docker-compose stop
+    docker_compose stop
     
     print_success "Containers parados com sucesso!"
 }
@@ -64,10 +72,10 @@ logs() {
     
     if [ -z "$service" ]; then
         print_info "Mostrando logs de todos os containers (Ctrl+C para sair)..."
-        docker-compose logs -f
+        docker_compose logs -f
     else
         print_info "Mostrando logs do serviço: $service (Ctrl+C para sair)..."
-        docker-compose logs -f "$service"
+        docker_compose logs -f "$service"
     fi
 }
 
@@ -79,7 +87,7 @@ clean() {
     
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_info "Parando e removendo containers..."
-        docker-compose down -v
+        docker_compose down -v
         
         print_info "Limpando diretório target do Maven..."
         if [ -d "target" ]; then
@@ -99,7 +107,7 @@ clean() {
 # Função restart: Reinicia os containers
 restart() {
     print_info "Reiniciando containers Docker..."
-    docker-compose restart
+    docker_compose restart
     
     print_success "Containers reiniciados com sucesso!"
 }
@@ -107,7 +115,7 @@ restart() {
 # Função status: Mostra o status dos containers
 status() {
     print_info "Status dos containers:"
-    docker-compose ps
+    docker_compose ps
 }
 
 # Função test: Executa os testes do projeto
@@ -162,17 +170,19 @@ coverage() {
 # Função sonar: Inicia SonarQube e executa análise
 sonar() {
     print_info "Iniciando SonarQube..."
-    docker-compose -f docker-compose.sonar.yml up -d
+    docker_compose -f docker-compose.sonar.yml up -d
     
     print_info "Aguardando SonarQube ficar pronto (isso pode levar alguns minutos)..."
     
-    # Aguarda SonarQube estar pronto
+    # Aguarda SonarQube estar pronto (status UP, não apenas respondendo)
     local max_attempts=60
     local attempt=0
-    
+    local sonar_status=""
+
     while [ $attempt -lt $max_attempts ]; do
-        if curl -f -s http://localhost:9000/api/system/status > /dev/null 2>&1; then
-            print_success "SonarQube está pronto!"
+        sonar_status=$(curl -s http://localhost:9000/api/system/status 2>/dev/null | grep -o '"status":"[^"]*"' | cut -d'"' -f4)
+        if [ "$sonar_status" = "UP" ]; then
+            print_success "SonarQube está pronto (status: UP)!"
             break
         fi
         attempt=$((attempt + 1))
@@ -182,7 +192,7 @@ sonar() {
     echo
     
     if [ $attempt -eq $max_attempts ]; then
-        print_error "SonarQube não ficou pronto a tempo. Verifique os logs com: docker-compose -f docker-compose.sonar.yml logs"
+        print_error "SonarQube não ficou pronto a tempo. Verifique os logs com: docker compose -f docker-compose.sonar.yml logs"
         exit 1
     fi
     
@@ -223,7 +233,7 @@ sonar() {
 # Função sonar-stop: Para o SonarQube
 sonar_stop() {
     print_info "Parando SonarQube..."
-    docker-compose -f docker-compose.sonar.yml down
+    docker_compose -f docker-compose.sonar.yml down
     
     print_success "SonarQube parado com sucesso!"
 }
@@ -231,30 +241,75 @@ sonar_stop() {
 # Função sonar-logs: Mostra logs do SonarQube
 sonar_logs() {
     print_info "Mostrando logs do SonarQube (Ctrl+C para sair)..."
-    docker-compose -f docker-compose.sonar.yml logs -f
+    docker_compose -f docker-compose.sonar.yml logs -f
 }
 
-# Função trivy: Executa análise de segurança com Trivy
-trivy() {
+# Função trivy_scan: Executa análise de segurança com Trivy
+trivy_scan() {
     # Verifica se o Trivy está instalado
-    if ! command -v trivy &> /dev/null; then
+    # Usa 'command -v' com '\trivy' para ignorar funções shell e encontrar apenas o binário externo
+    if ! command -v \trivy &> /dev/null; then
         print_error "Trivy não está instalado."
         print_info "Para instalar o Trivy, execute:"
         print_info "  brew install trivy  (macOS)"
         print_info "  ou visite: https://aquasecurity.github.io/trivy/latest/getting-started/installation/"
         exit 1
     fi
-    
-    print_info "Executando análise Trivy no Dockerfile..."
-    /opt/homebrew/bin/trivy config --severity HIGH,CRITICAL Dockerfile || print_warning "Falha na análise do Dockerfile"
-    
-    print_info "Executando análise Trivy no docker-compose.yml..."
-    /opt/homebrew/bin/trivy config --severity HIGH,CRITICAL docker-compose.yml || print_warning "Falha na análise do docker-compose.yml"
-    
-    print_info "Executando análise Trivy no código fonte..."
-    /opt/homebrew/bin/trivy fs --severity HIGH,CRITICAL --skip-dirs target . || print_warning "Falha na análise do código fonte"
-    
-    print_success "Análise Trivy concluída!"
+
+        local trivy_bin
+        trivy_bin="$(command -v \trivy)"
+        local report_dir="target/security"
+        mkdir -p "$report_dir"
+
+        print_info "Executando análise Trivy no Dockerfile..."
+        "$trivy_bin" config --severity HIGH,CRITICAL --exit-code 1 Dockerfile | tee "$report_dir/trivy-dockerfile.txt"
+
+        print_info "Executando análise Trivy no docker-compose.yml..."
+        "$trivy_bin" config --severity HIGH,CRITICAL --exit-code 1 docker-compose.yml | tee "$report_dir/trivy-docker-compose.txt"
+
+        print_info "Executando análise Trivy no código fonte..."
+        "$trivy_bin" fs --severity HIGH,CRITICAL --exit-code 1 --skip-dirs target . | tee "$report_dir/trivy-fs.txt"
+
+        print_success "Análise Trivy concluída sem findings HIGH/CRITICAL!"
+        print_info "Relatórios Trivy em: $report_dir"
+}
+
+# Função security: Pipeline completo de segurança
+security() {
+        local report_dir="target/security"
+        mkdir -p "$report_dir"
+
+        print_info "Etapa 1/4 - Executando Trivy..."
+        trivy_scan
+
+        print_info "Etapa 2/4 - Executando cobertura JaCoCo..."
+        coverage
+
+        print_info "Etapa 3/4 - Executando análise SonarQube..."
+        sonar
+
+        print_info "Etapa 4/4 - Consolidando evidências..."
+        # Recria o diretório pois 'mvn clean' na coverage pode ter apagado
+        mkdir -p "$report_dir"
+        local generated_at
+        generated_at="$(date '+%Y-%m-%d %H:%M:%S')"
+        cat > "$report_dir/security-summary.md" << EOF
+# Security Execution Summary
+
+- Generated at: $generated_at
+- Trivy:
+    - target/security/trivy-dockerfile.txt
+    - target/security/trivy-docker-compose.txt
+    - target/security/trivy-fs.txt
+- JaCoCo:
+    - target/site/jacoco/index.html
+- SonarQube:
+    - http://localhost:9000
+
+EOF
+
+        print_success "Pipeline de segurança concluído!"
+        print_info "Resumo gerado em: $report_dir/security-summary.md"
 }
 
 # Função help: Mostra ajuda
@@ -274,6 +329,7 @@ help() {
     echo "  sonar-stop  - Para o SonarQube"
     echo "  sonar-logs  - Mostra logs do SonarQube"
     echo "  trivy       - Executa análise de segurança com Trivy"
+    echo "  security    - Executa Trivy + JaCoCo + Sonar e consolida evidências"
     echo "  help        - Mostra esta mensagem de ajuda"
     echo ""
     echo "Exemplos:"
@@ -284,6 +340,7 @@ help() {
     echo "  $0 coverage"
     echo "  $0 sonar"
     echo "  $0 trivy"
+    echo "  $0 security"
 }
 
 # Verifica se o Docker e Docker Compose estão instalados
@@ -337,7 +394,10 @@ case "$1" in
         sonar_logs
         ;;
     trivy)
-        trivy
+        trivy_scan
+        ;;
+    security)
+        security
         ;;
     help|--help|-h)
         help
