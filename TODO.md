@@ -187,7 +187,7 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [ ] Adicionar participantes e usernames no Discord
 - [ ] Incluir link da documentação DDD
 - [ ] Incluir link do repositório
-- [ ] Incluir relatório de análise de vulnerabilidades
+- [x] Incluir relatório de análise de vulnerabilidades (docs/RELATORIO-SEGURANCA-GERENCIAL.md)
 
 ---
 
