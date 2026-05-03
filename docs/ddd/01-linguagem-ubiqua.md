@@ -24,7 +24,7 @@ Glossário oficial dos termos do domínio de Oficina Mecânica. Esses são os **
 | **Orçamento** | Valor total calculado a partir dos itens (serviços + peças) da OS, sujeito à aprovação do Cliente. | `OrdemServico.calcularOrcamento()` |
 | **Diagnóstico** | Etapa em que o Mecânico avalia o veículo e define os itens (serviços/peças) que comporão o orçamento. | Estados `EM_DIAGNOSTICO` |
 | **Estoque** | Quantidade disponível de uma Peça. Não pode ficar negativa. | `Peca.quantidadeEstoque` |
-| **Estoque Baixo** | Condição em que a quantidade de uma Peça atinge ou cruza o limite mínimo configurado. | `GET /pecas/estoque-baixo` |
+| **Estoque Baixo** | Condição em que a quantidade de uma Peça atinge ou cruza o limite mínimo configurado. | `GET /api/pecas/estoque-baixo` |
 
 ## Status da Ordem de Serviço
 

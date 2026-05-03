@@ -172,9 +172,9 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [ ] Demonstrar autenticação JWT
 
 ### Documentação
-- [ ] Finalizar documentação DDD no Miro
-- [ ] Revisar diagramas
-- [ ] Verificar aplicação da linguagem ubíqua
+- [x] Finalizar documentação DDD no Miro (https://miro.com/app/board/uXjVHZcarWY=/)
+- [x] Revisar diagramas (5 frames: Linguagem Ubíqua, Event Storming, Bounded Contexts, Diagrama de Estados, Hotspots)
+- [x] Verificar aplicação da linguagem ubíqua (glossário publicado no Frame 1 do Miro + `docs/ddd/01-linguagem-ubiqua.md`)
 
 ### Relatório de Vulnerabilidades
 - [x] Executar scan de segurança no código (Trivy + SonarQube)
@@ -183,10 +183,10 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [x] Documentar mitigações aplicadas (plano de ação no relatório)
 
 ### Documento de Entrega (PDF)
-- [ ] Criar PDF com nome do grupo
-- [ ] Adicionar participantes e usernames no Discord
-- [ ] Incluir link da documentação DDD
-- [ ] Incluir link do repositório
+- [x] Criar PDF com nome do grupo (Grupo 310 - `docs/ENTREGA-FASE-1.md`)
+- [x] Adicionar participantes e usernames no Discord (Danilo RM372600, Rodrigo RM372859, William RM372192)
+- [x] Incluir link da documentação DDD (https://miro.com/app/board/uXjVHZcarWY=/)
+- [x] Incluir link do repositório (https://github.com/daniloichaves/oficina-mecanica-tech)
 - [x] Incluir relatório de análise de vulnerabilidades (docs/RELATORIO-SEGURANCA-GERENCIAL.md)
 
 ---
@@ -201,7 +201,7 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [x] Verificar README.md completo
 
 ### Revisão Final
-- [ ] Revisar todos os requisitos técnicos
+- [x] Revisar todos os requisitos técnicos (docs/REVISAO-FINAL.md - auditoria completa realizada)
 - [x] Verificar todas as funcionalidades obrigatórias
 - [x] Testar execução local via README (aplicação iniciou com sucesso)
 - [x] Testar build com Docker (Maven build validado)

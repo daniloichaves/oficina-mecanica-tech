@@ -69,7 +69,7 @@ flowchart TB
 | Catálogo de Serviços | `com.oficina.mecanica.domain.entities.Servico` |
 | Estoque / Peças | `com.oficina.mecanica.domain.entities.Peca` |
 | Ordem de Serviço | `com.oficina.mecanica.domain.entities.OrdemServico`, `ItemServico`, `ItemPeca` |
-| IAM | (Spring Security + JWT em `infrastructure.config` / serviços de auth) |
-| Monitoramento | endpoint `GET /metricas/*` |
+| IAM | (Spring Security + JWT em `infrastructure.security` / serviços de auth) |
+| Monitoramento | endpoint `GET /api/metricas/*` |
 
 > **Decisão arquitetural**: o MVP mantém **um único módulo Maven**. A separação por Bounded Context é feita pela convenção de pacotes e pelos Aggregates Roots. Em uma evolução futura, cada contexto pode virar um módulo/serviço independente.

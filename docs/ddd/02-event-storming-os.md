@@ -43,7 +43,7 @@ Detalhamento por etapa: ator → comando → aggregate → eventos → política
 | 🟫 Aggregate | `Cliente`, `Veiculo`, `OrdemServico` |
 | 🟧 Eventos | `ClienteCadastrado`, `VeículoCadastrado`, `OSCriada` (status inicial = `RECEBIDA`) |
 | 🟪 Política | Se Cliente já existe (mesmo CPF/CNPJ), reutilizar; idem para Veículo (mesma Placa). |
-| 🟩 Read Model | Lista de OS por status (`GET /ordens-servico/status/RECEBIDA`) |
+| 🟩 Read Model | Lista de OS por status (`GET /api/ordens-servico/status/RECEBIDA`) |
 
 ### 2.2 Diagnóstico
 
@@ -55,7 +55,7 @@ Detalhamento por etapa: ator → comando → aggregate → eventos → política
 | 🟧 Eventos | `DiagnósticoIniciado`, `ItemServicoAdicionado`, `ItemPecaAdicionado`, `DiagnósticoConcluído`, `OrçamentoGerado` |
 | 🟪 Política | Ao concluir diagnóstico, **calcular orçamento automaticamente** (`OrdemServico.concluirDiagnostico()` chama `calcularOrcamento()`). |
 | 🟪 Política | Ao adicionar `ItemPeça`, verificar se há estoque suficiente (cruza com contexto de Estoque). |
-| 🟩 Read Model | Detalhe da OS (`GET /ordens-servico/{id}`) com soma de serviços + peças. |
+| 🟩 Read Model | Detalhe da OS (`GET /api/ordens-servico/{id}`) com soma de serviços + peças. |
 | 🟥 Hotspot | Não há comando para **remover** itens após adicionados. Validar se é necessário. |
 
 ### 2.3 Aprovação do orçamento
@@ -78,7 +78,7 @@ Detalhamento por etapa: ator → comando → aggregate → eventos → política
 | 🟦 Comando | `FinalizarOS` |
 | 🟫 Aggregate | `OrdemServico` |
 | 🟧 Eventos | `PeçasConsumidasNaOS` (cruza com Estoque), `OSFinalizada` |
-| 🟪 Política | Ao iniciar execução real, **decrementar estoque** das peças listadas — atualmente fica sob responsabilidade do operador via `PATCH /pecas/{id}/estoque` (🟥 hotspot: ainda não automatizado). |
+| 🟪 Política | Ao iniciar execução real, **decrementar estoque** das peças listadas — atualmente fica sob responsabilidade do operador via `PATCH /api/pecas/{id}/estoque` (🟥 hotspot: ainda não automatizado). |
 | 🟩 Read Model | OS em execução, tempo decorrido. |
 
 ### 2.5 Entrega
@@ -89,7 +89,7 @@ Detalhamento por etapa: ator → comando → aggregate → eventos → política
 | 🟦 Comando | `EntregarVeículo` |
 | 🟫 Aggregate | `OrdemServico` |
 | 🟧 Eventos | `VeículoEntregue` (status → `ENTREGUE`, `dataEntrega` registrada) |
-| 🟪 Política | A diferença entre `dataCriacao` e `dataEntrega` alimenta a métrica de **Tempo Médio de Execução** (`GET /metricas/tempo-medio-execucao`). |
+| 🟪 Política | A diferença entre `dataCriacao` e `dataEntrega` alimenta a métrica de **Tempo Médio de Execução** (`GET /api/metricas/tempo-medio-execucao`). |
 | 🟩 Read Model | Histórico do veículo, métricas operacionais. |
 
 ## 3. Diagrama de Estados

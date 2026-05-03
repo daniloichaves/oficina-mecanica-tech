@@ -131,7 +131,7 @@ sequenceDiagram
     participant VeicRepo as VeiculoRepository
     participant OSRepo as OrdemServicoRepository
 
-    Atendente->>API: POST /ordens-servico {clienteId, veiculoId}
+    Atendente->>API: POST /api/ordens-servico {clienteId, veiculoId}
     API->>App: criarOS(dto)
     App->>CliRepo: findById(clienteId)
     CliRepo-->>App: Cliente
@@ -155,7 +155,7 @@ sequenceDiagram
     participant OS as OrdemServico (Aggregate)
     participant Repo as OrdemServicoRepository
 
-    Atendente->>API: PATCH /ordens-servico/{id}/aprovar-orcamento
+    Atendente->>API: PATCH /api/ordens-servico/{id}/aprovar-orcamento
     API->>App: aprovarOrcamento(id)
     App->>Repo: findById(id)
     Repo-->>App: OrdemServico
@@ -192,14 +192,14 @@ flowchart TB
 
 | Camada | Pacote |
 |--------|--------|
-| Presentation | `presentation.controllers` |
+| Presentation | `presentation.rest` |
 | Application | `application.services`, `application.dto` |
 | Domain | `domain.entities`, `domain.valueobjects` |
-| Infrastructure | `infrastructure.persistence`, `infrastructure.config` |
+| Infrastructure | `infrastructure.persistence`, `infrastructure.security`, `infrastructure.config` |
 
 ## 6. Decisões de modelagem relevantes
 
-- **`Veiculo` como aggregate root próprio**: facilita consultas por placa e listagens, mesmo que conceitualmente seja parte do agregado Cliente. Trade-off consciente para suportar APIs `GET /veiculos/placa/{placa}`.
+- **`Veiculo` como aggregate root próprio**: facilita consultas por placa e listagens, mesmo que conceitualmente seja parte do agregado Cliente. Trade-off consciente para suportar APIs `GET /api/veiculos/placa/{placa}`.
 - **`ItemServico` e `ItemPeca` são entidades internas** do agregado `OrdemServico`: ciclo de vida atrelado à OS, não acessíveis fora dela.
 - **`StatusOrdemServico` como enum**: máquina de estados pequena e estável; transições protegidas por métodos de domínio em `OrdemServico`.
 - **`calcularOrcamento()` é determinístico**: não persiste eventos, apenas recalcula `valorTotal` a partir dos itens — pode ser chamado várias vezes.
