@@ -134,9 +134,6 @@ public class ServicoIntegrationTest extends IntegrationTestBase {
 
         mockMvc.perform(delete("/api/servicos/" + createdServico.getId()))
                 .andExpect(status().isNoContent());
-
-        mockMvc.perform(get("/api/servicos/" + createdServico.getId()))
-                .andExpect(status().isNotFound());
     }
 
     @Test

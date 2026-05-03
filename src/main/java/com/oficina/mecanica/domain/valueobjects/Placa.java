@@ -27,11 +27,7 @@ public class Placa {
     }
     
     public String formatada() {
-        if (valor.length() == 7) {
-            return valor.replaceAll("([A-Z]{3})([0-9])([A-Z0-9])([0-9]{2})", "$1-$2$3-$4");
-        } else {
-            return valor.replaceAll("([A-Z]{3})([0-9]{4})", "$1-$2");
-        }
+        return valor.replaceAll("([A-Z]{3})([0-9])([A-Z0-9])([0-9]{2})", "$1-$2$3-$4");
     }
     
     @Override

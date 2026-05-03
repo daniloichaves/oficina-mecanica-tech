@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -87,9 +90,15 @@ public class VeiculoService {
     
     @Transactional(readOnly = true)
     public List<VeiculoDTO> listarTodos() {
-        return veiculoRepository.findAll().stream()
+        return veiculoRepository.findAll(Pageable.unpaged()).stream()
             .map(this::toDTO)
             .collect(Collectors.toList());
+    }
+    
+    @Transactional(readOnly = true)
+    public Page<VeiculoDTO> listarTodos(Pageable pageable) {
+        return veiculoRepository.findAll(pageable)
+            .map(this::toDTO);
     }
     
     @Transactional(readOnly = true)

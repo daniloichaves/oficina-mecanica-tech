@@ -34,6 +34,19 @@ src/main/java/com/oficina/mecanica/
     └── rest/             # Controllers REST
 ```
 
+## Documentação DDD
+
+A modelagem completa do domínio (Event Storming, Bounded Contexts, Linguagem Ubíqua, Diagrama de Estados e Hotspots) está disponível em dois formatos:
+
+- **Miro (visual)**: https://miro.com/app/board/uXjVHZcarWY=/
+- **Markdown (versionado)**: pasta [`docs/ddd/`](docs/ddd/)
+  - `01-linguagem-ubiqua.md` — Glossário oficial do domínio
+  - `02-event-storming-os.md` — Fluxo da Ordem de Serviço
+  - `03-event-storming-pecas.md` — Fluxo de Estoque
+  - `04-bounded-contexts.md` — Context Map estratégico
+  - `05-design-level.md` — Aggregates, Entidades, Value Objects
+  - `06-casos-de-uso.md` — Casos de uso mapeados
+
 ## Funcionalidades
 
 ### Gestão de Clientes
@@ -139,6 +152,7 @@ docker-compose down
 ### Clientes
 - `POST /api/clientes` - Criar cliente
 - `GET /api/clientes` - Listar todos
+- `GET /api/clientes/paginado` - Listar com paginação (padrão: page=0, size=10)
 - `GET /api/clientes/{id}` - Buscar por ID
 - `GET /api/clientes/cpf/{cpfCnpj}` - Buscar por CPF/CNPJ
 - `PUT /api/clientes/{id}` - Atualizar
@@ -147,6 +161,7 @@ docker-compose down
 ### Veículos
 - `POST /api/veiculos` - Criar veículo
 - `GET /api/veiculos` - Listar todos
+- `GET /api/veiculos/paginado` - Listar com paginação (padrão: page=0, size=10)
 - `GET /api/veiculos/{id}` - Buscar por ID
 - `GET /api/veiculos/placa/{placa}` - Buscar por placa
 - `GET /api/veiculos/cliente/{clienteId}` - Listar por cliente
@@ -156,22 +171,25 @@ docker-compose down
 ### Serviços
 - `POST /api/servicos` - Criar serviço
 - `GET /api/servicos` - Listar todos
+- `GET /api/servicos/paginado` - Listar com paginação (padrão: page=0, size=10)
 - `GET /api/servicos/{id}` - Buscar por ID
 - `PUT /api/servicos/{id}` - Atualizar
 - `DELETE /api/servicos/{id}` - Deletar
 
 ### Peças
-- `POST /api/pecas` - Criar peça
+- `POST /api/pecas` - Criar peça/insumo
 - `GET /api/pecas` - Listar todas
+- `GET /api/pecas/paginado` - Listar com paginação (padrão: page=0, size=10)
 - `GET /api/pecas/{id}` - Buscar por ID
-- `GET /api/pecas/estoque-baixo?limite=5` - Listar estoque baixo
+- `GET /api/pecas/estoque-baixo` - Listar estoque baixo
 - `PUT /api/pecas/{id}` - Atualizar
-- `PATCH /api/pecas/{id}/estoque?quantidade=10` - Atualizar estoque
+- `PATCH /api/pecas/{id}/estoque` - Atualizar estoque
 - `DELETE /api/pecas/{id}` - Deletar
 
 ### Ordens de Serviço
 - `POST /api/ordens-servico` - Criar OS
 - `GET /api/ordens-servico` - Listar todas
+- `GET /api/ordens-servico/paginado` - Listar com paginação (padrão: page=0, size=10)
 - `GET /api/ordens-servico/{id}` - Buscar por ID
 - `GET /api/ordens-servico/cliente/{clienteId}` - Listar por cliente
 - `GET /api/ordens-servico/veiculo/{veiculoId}` - Listar por veículo
@@ -237,6 +255,42 @@ curl -X POST http://localhost:8080/api/ordens-servico \
 | DB_PASSWORD | Senha do banco | oficina123 |
 | JWT_SECRET | Secret para JWT | oficinaMecanicaSecretKey... |
 | JWT_EXPIRATION | Expiração do token (ms) | 86400000 |
+
+## Pipeline de Segurança e Qualidade
+
+O projeto inclui um pipeline automatizado de análise de segurança e qualidade via script:
+
+```bash
+./oficina-mecanica-tech.sh security
+```
+
+Este comando executa sequencialmente:
+
+| Etapa | Ferramenta | O que verifica |
+|-------|-----------|---------------|
+| 1 | **Trivy** | Vulnerabilidades no Dockerfile, docker-compose e código |
+| 2 | **JaCoCo** | Cobertura de testes (mínimo 90% em domínios críticos) |
+| 3 | **SonarQube** | Qualidade de código, duplicação e code smells |
+| 4 | **Consolidação** | Gera `target/security/security-summary.md` com evidências |
+
+### Outros comandos disponíveis
+
+```bash
+./oficina-mecanica-tech.sh trivy     # Apenas scan de segurança
+./oficina-mecanica-tech.sh sonar     # Apenas análise SonarQube
+./oficina-mecanica-tech.sh coverage  # Apenas cobertura JaCoCo
+./oficina-mecanica-tech.sh help      # Lista todos os comandos
+```
+
+### Relatório de Vulnerabilidades
+
+O relatório gerencial de segurança está disponível em:
+- `docs/RELATORIO-SEGURANCA-GERENCIAL.md`
+
+Inclui:
+- Vulnerabilidades HIGH/CRITICAL encontradas
+- Plano de ação com prioridades
+- Evidências das ferramentas (Trivy, JaCoCo, SonarQube)
 
 ## Testes
 
