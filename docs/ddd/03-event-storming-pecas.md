@@ -33,18 +33,18 @@ flowchart LR
 | 🟫 Aggregate | `Peca` |
 | 🟧 Eventos | `PeçaCadastrada`, `PeçaAtualizada`, `PeçaRemovida` |
 | 🟪 Política | Não permitir remoção se a Peça estiver vinculada a uma OS ativa (🟥 hotspot — não checado hoje). |
-| 🟩 Read Model | `GET /pecas`, `GET /pecas/{id}` |
+| 🟩 Read Model | `GET /api/pecas`, `GET /api/pecas/{id}` |
 
 ### 2.2 Entrada de estoque
 
 | Elemento | Conteúdo |
 |----------|----------|
 | 🟨 Ator | Administrador / Estoquista |
-| 🟦 Comando | `AtualizarEstoque(quantidade)` (`PATCH /pecas/{id}/estoque`) |
+| 🟦 Comando | `AtualizarEstoque(quantidade)` (`PATCH /api/pecas/{id}/estoque`) |
 | 🟫 Aggregate | `Peca` |
 | 🟧 Eventos | `EstoqueAtualizado` |
 | 🟪 Política | Ao cair abaixo do limite mínimo, emitir alerta `EstoqueBaixoDetectado`. |
-| 🟩 Read Model | `GET /pecas/estoque-baixo` |
+| 🟩 Read Model | `GET /api/pecas/estoque-baixo` |
 
 ### 2.3 Consumo de Peça em uma OS (cross-context)
 
@@ -76,13 +76,13 @@ flowchart LR
 
 | Comando | Endpoint REST |
 |---------|---------------|
-| `CadastrarPeça` | `POST /pecas` |
-| `AtualizarPeça` | `PUT /pecas/{id}` |
-| `RemoverPeça` | `DELETE /pecas/{id}` |
-| `AtualizarEstoque` | `PATCH /pecas/{id}/estoque` |
-| `ConsultarPeça` | `GET /pecas/{id}` |
-| `ListarPeças` | `GET /pecas` |
-| `ListarEstoqueBaixo` | `GET /pecas/estoque-baixo` |
+| `CadastrarPeça` | `POST /api/pecas` |
+| `AtualizarPeça` | `PUT /api/pecas/{id}` |
+| `RemoverPeça` | `DELETE /api/pecas/{id}` |
+| `AtualizarEstoque` | `PATCH /api/pecas/{id}/estoque` |
+| `ConsultarPeça` | `GET /api/pecas/{id}` |
+| `ListarPeças` | `GET /api/pecas` |
+| `ListarEstoqueBaixo` | `GET /api/pecas/estoque-baixo` |
 
 ## 5. Hotspots
 

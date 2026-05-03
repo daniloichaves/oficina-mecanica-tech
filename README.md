@@ -34,6 +34,19 @@ src/main/java/com/oficina/mecanica/
     └── rest/             # Controllers REST
 ```
 
+## Documentação DDD
+
+A modelagem completa do domínio (Event Storming, Bounded Contexts, Linguagem Ubíqua, Diagrama de Estados e Hotspots) está disponível em dois formatos:
+
+- **Miro (visual)**: https://miro.com/app/board/uXjVHZcarWY=/
+- **Markdown (versionado)**: pasta [`docs/ddd/`](docs/ddd/)
+  - `01-linguagem-ubiqua.md` — Glossário oficial do domínio
+  - `02-event-storming-os.md` — Fluxo da Ordem de Serviço
+  - `03-event-storming-pecas.md` — Fluxo de Estoque
+  - `04-bounded-contexts.md` — Context Map estratégico
+  - `05-design-level.md` — Aggregates, Entidades, Value Objects
+  - `06-casos-de-uso.md` — Casos de uso mapeados
+
 ## Funcionalidades
 
 ### Gestão de Clientes
