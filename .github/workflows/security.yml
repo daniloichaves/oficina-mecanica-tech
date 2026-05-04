@@ -23,6 +23,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: maven
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
@@ -51,14 +58,26 @@ jobs:
   sonarqube:
     name: SonarQube Analysis
     runs-on: ubuntu-latest
-    
+
     steps:
+      - name: Check SonarQube Secrets
+        id: check_secrets
+        run: |
+          if [ -z "${{ secrets.SONAR_TOKEN }}" ] || [ -z "${{ secrets.SONAR_HOST_URL }}" ]; then
+            echo "SONAR_CONFIGURED=false" >> $GITHUB_OUTPUT
+            echo "::warning::SonarQube secrets not configured. Skipping analysis."
+          else
+            echo "SONAR_CONFIGURED=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout
+        if: steps.check_secrets.outputs.SONAR_CONFIGURED == 'true'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up JDK 21
+        if: steps.check_secrets.outputs.SONAR_CONFIGURED == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -66,13 +85,19 @@ jobs:
           cache: maven
 
       - name: Build with Maven
+        if: steps.check_secrets.outputs.SONAR_CONFIGURED == 'true'
         run: mvn -B clean verify
 
       - name: SonarQube Scan
+        if: steps.check_secrets.outputs.SONAR_CONFIGURED == 'true'
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn sonar:sonar -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN
+        run: |
+          mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.host.url=$SONAR_HOST_URL \
+            -Dsonar.token=$SONAR_TOKEN \
+            -Dsonar.projectKey=daniloichaves_oficina-mecanica-tech
 
   trivy:
     name: Trivy Security Scan
