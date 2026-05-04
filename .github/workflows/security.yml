@@ -94,11 +94,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
-          mvn sonar:sonar \
+          mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.host.url=$SONAR_HOST_URL \
-            -Dsonar.login=$SONAR_TOKEN \
-            -Dsonar.projectKey=daniloichaves_oficina-mecanica-tech \
-            -Dsonar.organization=daniloichaves
+            -Dsonar.token=$SONAR_TOKEN \
+            -Dsonar.projectKey=daniloichaves_oficina-mecanica-tech
 
   trivy:
     name: Trivy Security Scan

@@ -21,6 +21,7 @@
     <properties>
         <java.version>21</java.version>
         <springdoc.version>2.5.0</springdoc.version>
+        <sonar.organization>daniloichaves</sonar.organization>
     </properties>
     
     <dependencies>
