@@ -2,6 +2,10 @@
 
 Sistema integrado de gestão de oficina mecânica desenvolvido como MVP para o Tech Challenge. O sistema permite gerenciar ordens de serviço, clientes, veículos, serviços e peças com controle de estoque e acompanhamento em tempo real.
 
+## 📹 Demonstração Completa
+
+**Video de demonstração com todos os endpoints funcionando:** https://www.awesomescreenshot.com/video/52274462?key=d86c873188c071d0944347547ee234dd
+
 ## Stack Tecnológica
 
 - **Java 21** - Linguagem principal
