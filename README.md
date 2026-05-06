@@ -8,6 +8,7 @@ Sistema integrado de gestão de oficina mecânica desenvolvido como MVP para o T
 - **Spring Boot 3.2.5** - Framework
 - **Spring Data JPA** - ORM e persistência
 - **PostgreSQL 16** - Banco de dados relacional
+- **Spring Security + JWT** - Autenticação stateless
 - **SpringDoc OpenAPI** - Documentação da API (Swagger)
 - **Lombok** - Redução de código boilerplate
 - **Maven** - Gerenciamento de dependências
@@ -131,6 +132,11 @@ cd oficina-mecanica
 docker-compose up -d
 ```
 
+Ou via WSL no Windows:
+```bash
+wsl docker compose up -d
+```
+
 Isso iniciará:
 - PostgreSQL na porta 5432
 - Aplicação Spring Boot na porta 8080
@@ -210,12 +216,15 @@ docker-compose down
 curl -X POST http://localhost:8080/api/clientes \
   -H "Content-Type: application/json" \
   -d '{
-    "cpfCnpj": "12345678901",
+    "cpfCnpj": "52998224725",
     "nome": "João Silva",
     "telefone": "11999999999",
-    "email": "joao@email.com"
+    "email": "joao@email.com",
+    "endereco": "Rua das Flores, 150, São Paulo - SP"
   }'
 ```
+
+> **Nota:** O CPF/CNPJ é validado algoritmicamente. Use um CPF válido (ex: `52998224725`, `98765432100`).
 
 ### 2. Criar um Veículo
 ```bash

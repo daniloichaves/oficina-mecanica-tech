@@ -164,4 +164,4 @@ Detalhes completos no [README.md](../README.md).
 
 ---
 
-_Documento gerado em 03/05/2026 — Tech Challenge SOAT Fase 1_
+_Documento gerado em 03/05/2026 — Atualizado em 05/05/2026 — Tech Challenge SOAT Fase 1_

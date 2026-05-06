@@ -17,6 +17,6 @@ public interface OrdemServicoRepository extends JpaRepository<OrdemServico, Long
     List<OrdemServico> findByStatus(StatusOrdemServico status);
     Page<OrdemServico> findAll(Pageable pageable);
     
-    @Query(value = "SELECT AVG(DATEDIFF('DAY', os.data_criacao, os.data_entrega)) FROM ordem_servico os WHERE os.data_entrega IS NOT NULL", nativeQuery = true)
+    @Query(value = "SELECT AVG(EXTRACT(EPOCH FROM (os.data_entrega - os.data_criacao)) / 60) FROM ordens_servico os WHERE os.data_entrega IS NOT NULL", nativeQuery = true)
     Double getTempoMedioExecucao();
 }
