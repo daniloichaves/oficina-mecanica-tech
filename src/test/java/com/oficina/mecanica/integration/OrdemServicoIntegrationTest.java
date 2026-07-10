@@ -111,6 +111,97 @@ public class OrdemServicoIntegrationTest extends IntegrationTestBase {
         pecaId = createdPeca.getId();
     }
 
+    private Long criarOrdemServico() throws Exception {
+        CriarOrdemServicoDTO osDTO = CriarOrdemServicoDTO.builder()
+                .clienteId(clienteId)
+                .veiculoId(veiculoId)
+                .itensServico(List.of(
+                        ItemServicoDTO.builder()
+                                .servicoId(servicoId)
+                                .quantidade(1)
+                                .build()
+                ))
+                .build();
+
+        String response = mockMvc.perform(post("/api/ordens-servico")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(osDTO)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        return objectMapper.readValue(response, OrdemServicoDTO.class).getId();
+    }
+
+    private Long criarOsAguardandoAprovacao() throws Exception {
+        Long osId = criarOrdemServico();
+        mockMvc.perform(patch("/api/ordens-servico/" + osId + "/iniciar-diagnostico"))
+                .andExpect(status().isOk());
+        mockMvc.perform(patch("/api/ordens-servico/" + osId + "/concluir-diagnostico"))
+                .andExpect(status().isOk());
+        return osId;
+    }
+
+    @Test
+    void deveConsultarStatusDaOS() throws Exception {
+        Long osId = criarOrdemServico();
+
+        mockMvc.perform(get("/api/ordens-servico/" + osId + "/status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(osId))
+                .andExpect(jsonPath("$.status").value("RECEBIDA"))
+                .andExpect(jsonPath("$.descricao").value("Recebida"));
+    }
+
+    @Test
+    void webhookDeveAprovarOrcamento() throws Exception {
+        Long osId = criarOsAguardandoAprovacao();
+
+        mockMvc.perform(post("/api/webhooks/orcamento")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"ordemServicoId\":" + osId + ",\"aprovado\":true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("EM_EXECUCAO"))
+                .andExpect(jsonPath("$.orcamentoAprovado").value(true));
+    }
+
+    @Test
+    void webhookDeveRecusarOrcamento() throws Exception {
+        Long osId = criarOsAguardandoAprovacao();
+
+        mockMvc.perform(post("/api/webhooks/orcamento")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"ordemServicoId\":" + osId + ",\"aprovado\":false}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CANCELADA"))
+                .andExpect(jsonPath("$.orcamentoAprovado").value(false));
+    }
+
+    @Test
+    void listagemDeveOrdenarPorStatusEExcluirFinalizadasEEntregues() throws Exception {
+        Long osRecebida = criarOrdemServico();
+        Long osEmDiagnostico = criarOrdemServico();
+        mockMvc.perform(patch("/api/ordens-servico/" + osEmDiagnostico + "/iniciar-diagnostico"))
+                .andExpect(status().isOk());
+        Long osEmExecucao = criarOsAguardandoAprovacao();
+        mockMvc.perform(patch("/api/ordens-servico/" + osEmExecucao + "/aprovar-orcamento"))
+                .andExpect(status().isOk());
+        Long osEntregue = criarOsAguardandoAprovacao();
+        mockMvc.perform(patch("/api/ordens-servico/" + osEntregue + "/aprovar-orcamento"))
+                .andExpect(status().isOk());
+        mockMvc.perform(patch("/api/ordens-servico/" + osEntregue + "/finalizar"))
+                .andExpect(status().isOk());
+        mockMvc.perform(patch("/api/ordens-servico/" + osEntregue + "/entregar"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/ordens-servico"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].id").value(osEmExecucao))
+                .andExpect(jsonPath("$[1].id").value(osEmDiagnostico))
+                .andExpect(jsonPath("$[2].id").value(osRecebida));
+    }
+
     @Test
     void testCriarOrdemServico() throws Exception {
         CriarOrdemServicoDTO osDTO = CriarOrdemServicoDTO.builder()

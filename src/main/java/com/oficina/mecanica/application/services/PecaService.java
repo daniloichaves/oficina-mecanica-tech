@@ -2,7 +2,7 @@ package com.oficina.mecanica.application.services;
 
 import com.oficina.mecanica.application.dto.PecaDTO;
 import com.oficina.mecanica.domain.entities.Peca;
-import com.oficina.mecanica.infrastructure.persistence.PecaRepository;
+import com.oficina.mecanica.domain.repositories.PecaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

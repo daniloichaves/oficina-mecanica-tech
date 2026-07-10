@@ -4,7 +4,45 @@ Sistema integrado de gestão de oficina mecânica desenvolvido como MVP para o T
 
 ## 📹 Demonstração Completa
 
-**Video de demonstração com todos os endpoints funcionando:** https://www.awesomescreenshot.com/video/52274462?key=d86c873188c071d0944347547ee234dd
+**Video de demonstração com todos os endpoints funcionando (Fase 1):** https://www.awesomescreenshot.com/video/52274462?key=d86c873188c071d0944347547ee234dd
+
+**Vídeo demonstrativo da Fase 2 (deploy, CI/CD, APIs, HPA):** _[PENDENTE — inserir link YouTube/Vimeo não listado, até 15 min]_
+
+## Fase 2 — Objetivos
+
+Evolução da aplicação da Fase 1 para garantir **qualidade, resiliência e escalabilidade**:
+
+- Refatoração para **arquitetura hexagonal** (ports & adapters) — a aplicação depende de interfaces de domínio (`domain/repositories`), implementadas por adapters JPA e SMTP na infraestrutura;
+- Novas APIs de Ordem de Serviço: consulta de status, webhook de aprovação/recusa de orçamento, listagem ordenada por prioridade com exclusão lógica;
+- Notificação do cliente por **e-mail** a cada mudança de status da OS;
+- **Kubernetes** ([`k8s/`](k8s/)): Deployments, Services, ConfigMap, Secrets e HPA (escala de 2 a 6 pods por CPU/memória);
+- **Terraform** ([`infra/`](infra/)): provisionamento do cluster (kind) e do banco de dados;
+- **CI/CD** (GitHub Actions): build, testes, imagem Docker no GHCR e deploy dos manifestos em cluster Kubernetes.
+
+### Desenho da Arquitetura
+
+```mermaid
+flowchart LR
+    subgraph CICD ["CI/CD - GitHub Actions"]
+        A[build + testes] --> B[imagem Docker → GHCR]
+        B --> C[kubectl apply k8s/]
+    end
+    subgraph K8S ["Cluster Kubernetes (kind, provisionado via Terraform)"]
+        D["Service NodePort 30080"] --> E["Deployment oficina-app (2..6 réplicas, HPA)"]
+        E --> F[("PostgreSQL 16")]
+        E --> G["SMTP (Mailhog)"]
+    end
+    C --> K8S
+    U["Cliente / Sistema externo"] -->|"REST + webhook"| D
+```
+
+**Fluxo de deploy:** push na branch → `build-and-test` (Maven + JaCoCo) → `docker` (build e push da imagem para `ghcr.io/daniloichaves/oficina-mecanica`) → `deploy` (cluster kind no runner, `kubectl apply -f k8s/`, rollout do banco e da aplicação, smoke test no `/actuator/health`).
+
+### Decisões de arquitetura (Fase 2)
+
+- **Hexagonal pragmática:** os ports de repositório/notificação vivem em `domain/repositories`; os adapters (Spring Data JPA, SMTP) na infraestrutura. As entidades de domínio mantêm anotações JPA — tradeoff consciente de MVP para não duplicar o modelo; documentado nos próprios ports.
+- **Recusa de orçamento → status `CANCELADA`:** o enunciado prevê aprovação/recusa via notificação externa; a recusa encerra a OS com `CANCELADA` (fora da fila de trabalho, mantida no banco).
+- **Exclusão lógica na listagem:** `GET /api/ordens-servico` omite `FINALIZADA`/`ENTREGUE`/`CANCELADA` (nada é apagado; tudo permanece acessível por id e em `/paginado`).
 
 ## Stack Tecnológica
 
@@ -20,22 +58,23 @@ Sistema integrado de gestão de oficina mecânica desenvolvido como MVP para o T
 
 ## Arquitetura
 
-O projeto segue os princípios de **Domain-Driven Design (DDD)** com arquitetura em camadas:
+O projeto segue **DDD** com **arquitetura hexagonal (ports & adapters)**:
 
 ```
 src/main/java/com/oficina/mecanica/
-├── domain/                 # Camada de Domínio
+├── domain/                 # Núcleo (não depende da infraestrutura)
 │   ├── entities/          # Entidades (Cliente, Veículo, OS, etc.)
 │   ├── valueobjects/      # Value Objects (CPF/CNPJ, Placa)
-│   └── repositories/      # Interfaces de repositórios
+│   └── repositories/      # PORTS: interfaces de repositório e notificação
 ├── application/           # Camada de Aplicação
 │   ├── dto/              # Data Transfer Objects
-│   └── services/         # Serviços de negócio
-├── infrastructure/       # Camada de Infraestrutura
-│   ├── persistence/      # Implementação dos repositórios
-│   ├── security/         # Configuração de segurança
+│   └── services/         # Casos de uso (dependem só dos ports)
+├── infrastructure/       # ADAPTERS
+│   ├── persistence/      # Spring Data JPA implementando os ports
+│   ├── notification/     # Adapter SMTP (e-mail de mudança de status)
+│   ├── security/         # JWT / Spring Security
 │   └── config/           # Configurações gerais
-└── presentation/          # Camada de Apresentação
+└── presentation/          # Adapter de entrada
     └── rest/             # Controllers REST
 ```
 
@@ -143,6 +182,7 @@ wsl docker compose up -d
 
 Isso iniciará:
 - PostgreSQL na porta 5432
+- Mailhog (SMTP dev) nas portas 1025/8025 — UI em http://localhost:8025
 - Aplicação Spring Boot na porta 8080
 
 ### Verificar logs
@@ -156,6 +196,39 @@ docker-compose logs -f app
 ```bash
 docker-compose down
 ```
+
+## Deploy em Kubernetes (Fase 2)
+
+Pré-requisitos: cluster Kubernetes (kind, minikube ou cloud) e `kubectl` configurado.
+
+```bash
+kubectl apply -f k8s/
+kubectl -n oficina rollout status deployment/oficina-app
+```
+
+Sobe: namespace `oficina`, PostgreSQL (PVC + Deployment + Service), Mailhog, aplicação (2 réplicas, probes no `/actuator/health`), Service NodePort `30080` e HPA (2–6 réplicas, CPU 70% / memória 80%).
+
+O HPA exige o **metrics-server** (instruções em [`infra/README.md`](infra/README.md)). Para testar a escalabilidade: gerar carga nas APIs e acompanhar com `kubectl -n oficina get hpa -w`.
+
+## Provisionamento com Terraform (Fase 2)
+
+Cluster kind + banco de dados provisionados via IaC — recursos, pré-requisitos e passo a passo documentados em [`infra/README.md`](infra/README.md):
+
+```bash
+cd infra && terraform init && terraform apply
+```
+
+## CI/CD (Fase 2)
+
+Pipeline em [`.github/workflows/ci.yml`](.github/workflows/ci.yml) com 3 estágios:
+
+1. **build-and-test** — `mvn clean verify` (testes + gate de cobertura JaCoCo);
+2. **docker** — build e push da imagem para `ghcr.io/daniloichaves/oficina-mecanica` (`latest` + SHA);
+3. **deploy** — cria cluster kind no runner, carrega a imagem, aplica `k8s/` (banco + app), aguarda os rollouts e roda smoke test no `/actuator/health`.
+
+## Collection das APIs
+
+- **Swagger UI:** http://localhost:8080/swagger-ui.html (OpenAPI em `/api-docs`)
 
 ## Endpoints da API
 
@@ -197,10 +270,11 @@ docker-compose down
 - `DELETE /api/pecas/{id}` - Deletar
 
 ### Ordens de Serviço
-- `POST /api/ordens-servico` - Criar OS
-- `GET /api/ordens-servico` - Listar todas
-- `GET /api/ordens-servico/paginado` - Listar com paginação (padrão: page=0, size=10)
+- `POST /api/ordens-servico` - Criar OS (retorna a identificação única)
+- `GET /api/ordens-servico` - **(Fase 2)** Listar OS ativas ordenadas por prioridade de status (Em Execução > Aguardando Aprovação > Em Diagnóstico > Recebida; mais antigas primeiro; exclui finalizadas/entregues/canceladas)
+- `GET /api/ordens-servico/paginado` - Listar todas com paginação (inclui finalizadas/entregues)
 - `GET /api/ordens-servico/{id}` - Buscar por ID
+- `GET /api/ordens-servico/{id}/status` - **(Fase 2)** Consultar situação atual da OS
 - `GET /api/ordens-servico/cliente/{clienteId}` - Listar por cliente
 - `GET /api/ordens-servico/veiculo/{veiculoId}` - Listar por veículo
 - `GET /api/ordens-servico/status/{status}` - Listar por status
@@ -209,6 +283,14 @@ docker-compose down
 - `PATCH /api/ordens-servico/{id}/aprovar-orcamento` - Aprovar orçamento
 - `PATCH /api/ordens-servico/{id}/finalizar` - Finalizar OS
 - `PATCH /api/ordens-servico/{id}/entregar` - Entregar veículo
+
+### Webhooks (Fase 2)
+- `POST /api/webhooks/orcamento` - Notificação externa de aprovação/recusa do orçamento (público, sem JWT)
+  ```json
+  { "ordemServicoId": 1, "aprovado": true }
+  ```
+
+> **Notificação por e-mail (Fase 2):** a cada mudança de status da OS o cliente recebe um e-mail. Em desenvolvimento, os e-mails ficam visíveis no Mailhog: http://localhost:8025
 
 ### Métricas
 - `GET /api/metricas/tempo-medio-execucao` - Tempo médio de execução
@@ -268,6 +350,8 @@ curl -X POST http://localhost:8080/api/ordens-servico \
 | DB_PASSWORD | Senha do banco | oficina123 |
 | JWT_SECRET | Secret para JWT | oficinaMecanicaSecretKey... |
 | JWT_EXPIRATION | Expiração do token (ms) | 86400000 |
+| MAIL_HOST | Host SMTP para notificações | localhost |
+| MAIL_PORT | Porta SMTP | 1025 |
 
 ## Pipeline de Segurança e Qualidade
 
