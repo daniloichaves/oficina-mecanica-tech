@@ -2,7 +2,7 @@ package com.oficina.mecanica.application.services;
 
 import com.oficina.mecanica.application.dto.*;
 import com.oficina.mecanica.domain.entities.*;
-import com.oficina.mecanica.infrastructure.persistence.*;
+import com.oficina.mecanica.domain.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
