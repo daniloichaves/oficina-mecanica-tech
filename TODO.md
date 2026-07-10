@@ -209,6 +209,34 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 
 ---
 
+## FASE 2 - Tech Challenge
+
+### Evolução da aplicação
+- [x] Refatorar para arquitetura hexagonal (ports em `domain/repositories`, adapters JPA/SMTP na infraestrutura)
+- [x] Consulta de status da OS - `GET /api/ordens-servico/{id}/status`
+- [x] Webhook de aprovação/recusa de orçamento - `POST /api/webhooks/orcamento` (status CANCELADA na recusa)
+- [x] Listagem ordenada por status (Execução > Aguardando Aprovação > Diagnóstico > Recebida, mais antigas primeiro) com exclusão lógica de finalizadas/entregues
+- [x] Notificação de mudança de status por e-mail (Mailhog em dev)
+- [x] Testes automatizados cobrindo os fluxos novos (unitários + integração)
+
+### Infraestrutura
+- [x] Dockerfile e docker-compose revisados (Mailhog adicionado)
+- [x] Manifestos Kubernetes em `/k8s` (Deployments, Services, ConfigMap, Secrets, HPA)
+- [x] Terraform em `/infra` (cluster kind + banco de dados, documentado)
+- [x] Pipeline CI/CD (build, testes, imagem GHCR, deploy em kind com smoke test)
+- [x] README atualizado (arquitetura, instruções local/K8s/Terraform, collection)
+
+### Pendências manuais (não automatizáveis)
+- [ ] Validar pipeline no GitHub Actions após push da branch `fase-2`
+- [ ] Testar `terraform apply` + `kubectl apply -f k8s/` de ponta a ponta com Docker local (validado até `terraform validate` e parse dos manifestos; kind não instalado nesta máquina)
+- [ ] Gravar vídeo de até 15 min (roteiro em `docs/ENTREGA-FASE-2.md`) e publicar no YouTube/Vimeo (não listado)
+- [ ] Inserir o link do vídeo no README e em `docs/ENTREGA-FASE-2.md`
+- [ ] (Opcional) Exportar collection Postman para `docs/postman/` — Swagger já atende "ou similar"
+- [ ] Gerar PDF a partir de `docs/ENTREGA-FASE-2.md` e enviar no portal do aluno
+- [ ] Confirmar repositório compartilhado com `soat-architecture`
+
+---
+
 ## Status Atual
 - [x] Planejamento: Concluído
 - [x] Arquitetura: Concluído
