@@ -21,6 +21,11 @@ spring:
     console:
       enabled: true
 
+  # sem SMTP em teste: o adapter engole a falha de conexão e só loga warn
+  mail:
+    host: localhost
+    port: 3025
+
   main:
     allow-bean-definition-overriding: true
 

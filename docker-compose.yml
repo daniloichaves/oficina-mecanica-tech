@@ -16,6 +16,13 @@ services:
       timeout: 5s
       retries: 5
 
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: oficina-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
   app:
     build: .
     container_name: oficina-app
@@ -27,6 +34,8 @@ services:
       DB_PASSWORD: oficina123
       JWT_SECRET: oficinaMecanicaSecretKeyForJWTTokenGeneration2024
       JWT_EXPIRATION: 86400000
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
     depends_on:
       postgres:
         condition: service_healthy

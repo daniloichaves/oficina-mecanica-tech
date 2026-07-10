@@ -24,6 +24,7 @@ public class OrdemServicoService {
     private final VeiculoRepository veiculoRepository;
     private final ServicoRepository servicoRepository;
     private final PecaRepository pecaRepository;
+    private final NotificacaoPort notificacaoPort;
     
     public OrdemServicoDTO criar(CriarOrdemServicoDTO dto) {
         Cliente cliente = clienteRepository.findById(dto.getClienteId())
@@ -79,6 +80,7 @@ public class OrdemServicoService {
             .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
         os.iniciarDiagnostico();
         os = ordemServicoRepository.save(os);
+        notificacaoPort.notificarMudancaStatus(os);
         return toDTO(os);
     }
     
@@ -87,6 +89,7 @@ public class OrdemServicoService {
             .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
         os.concluirDiagnostico();
         os = ordemServicoRepository.save(os);
+        notificacaoPort.notificarMudancaStatus(os);
         return toDTO(os);
     }
     
@@ -95,6 +98,7 @@ public class OrdemServicoService {
             .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
         os.aprovarOrcamento();
         os = ordemServicoRepository.save(os);
+        notificacaoPort.notificarMudancaStatus(os);
         return toDTO(os);
     }
     
@@ -103,6 +107,7 @@ public class OrdemServicoService {
             .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
         os.recusarOrcamento();
         os = ordemServicoRepository.save(os);
+        notificacaoPort.notificarMudancaStatus(os);
         return toDTO(os);
     }
 
@@ -111,6 +116,7 @@ public class OrdemServicoService {
             .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
         os.finalizar();
         os = ordemServicoRepository.save(os);
+        notificacaoPort.notificarMudancaStatus(os);
         return toDTO(os);
     }
     
@@ -119,6 +125,7 @@ public class OrdemServicoService {
             .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
         os.entregar();
         os = ordemServicoRepository.save(os);
+        notificacaoPort.notificarMudancaStatus(os);
         return toDTO(os);
     }
     
