@@ -194,8 +194,8 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 ## Fase 8 - Finalização
 
 ### Repositório
-- [ ] Configurar repositório privado
-- [ ] Dar acesso ao usuário soat-architecture
+- [x] Configurar repositório privado
+- [x] Dar acesso ao usuário soat-architecture
 - [ ] Verificar commit de todo código-fonte
 - [x] Verificar presença de Dockerfile e docker-compose.yml
 - [x] Verificar README.md completo
@@ -235,7 +235,7 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [ ] Inserir o link do vídeo no README e em `docs/ENTREGA-FASE-2.md`
 - [ ] (Opcional) Exportar collection Postman para `docs/postman/` — Swagger já atende "ou similar"
 - [ ] Gerar PDF a partir de `docs/ENTREGA-FASE-2.md` e enviar no portal do aluno
-- [ ] Confirmar repositório compartilhado com `soat-architecture`
+- [x] Confirmar repositório compartilhado com `soat-architecture` (verificado: repo privado, colaboradores daniloichaves, soat-architecture, rbragantini)
 
 ---
 
