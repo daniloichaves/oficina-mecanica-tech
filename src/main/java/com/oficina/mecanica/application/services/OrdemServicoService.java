@@ -98,6 +98,14 @@ public class OrdemServicoService {
         return toDTO(os);
     }
     
+    public OrdemServicoDTO recusarOrcamento(Long id) {
+        OrdemServico os = ordemServicoRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
+        os.recusarOrcamento();
+        os = ordemServicoRepository.save(os);
+        return toDTO(os);
+    }
+
     public OrdemServicoDTO finalizar(Long id) {
         OrdemServico os = ordemServicoRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));

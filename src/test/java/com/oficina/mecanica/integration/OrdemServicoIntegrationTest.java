@@ -154,6 +154,30 @@ public class OrdemServicoIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    void webhookDeveAprovarOrcamento() throws Exception {
+        Long osId = criarOsAguardandoAprovacao();
+
+        mockMvc.perform(post("/api/webhooks/orcamento")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"ordemServicoId\":" + osId + ",\"aprovado\":true}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("EM_EXECUCAO"))
+                .andExpect(jsonPath("$.orcamentoAprovado").value(true));
+    }
+
+    @Test
+    void webhookDeveRecusarOrcamento() throws Exception {
+        Long osId = criarOsAguardandoAprovacao();
+
+        mockMvc.perform(post("/api/webhooks/orcamento")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"ordemServicoId\":" + osId + ",\"aprovado\":false}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CANCELADA"))
+                .andExpect(jsonPath("$.orcamentoAprovado").value(false));
+    }
+
+    @Test
     void testCriarOrdemServico() throws Exception {
         CriarOrdemServicoDTO osDTO = CriarOrdemServicoDTO.builder()
                 .clienteId(clienteId)
