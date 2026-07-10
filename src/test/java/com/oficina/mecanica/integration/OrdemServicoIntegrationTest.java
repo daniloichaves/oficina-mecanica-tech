@@ -111,6 +111,48 @@ public class OrdemServicoIntegrationTest extends IntegrationTestBase {
         pecaId = createdPeca.getId();
     }
 
+    private Long criarOrdemServico() throws Exception {
+        CriarOrdemServicoDTO osDTO = CriarOrdemServicoDTO.builder()
+                .clienteId(clienteId)
+                .veiculoId(veiculoId)
+                .itensServico(List.of(
+                        ItemServicoDTO.builder()
+                                .servicoId(servicoId)
+                                .quantidade(1)
+                                .build()
+                ))
+                .build();
+
+        String response = mockMvc.perform(post("/api/ordens-servico")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(osDTO)))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        return objectMapper.readValue(response, OrdemServicoDTO.class).getId();
+    }
+
+    private Long criarOsAguardandoAprovacao() throws Exception {
+        Long osId = criarOrdemServico();
+        mockMvc.perform(patch("/api/ordens-servico/" + osId + "/iniciar-diagnostico"))
+                .andExpect(status().isOk());
+        mockMvc.perform(patch("/api/ordens-servico/" + osId + "/concluir-diagnostico"))
+                .andExpect(status().isOk());
+        return osId;
+    }
+
+    @Test
+    void deveConsultarStatusDaOS() throws Exception {
+        Long osId = criarOrdemServico();
+
+        mockMvc.perform(get("/api/ordens-servico/" + osId + "/status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(osId))
+                .andExpect(jsonPath("$.status").value("RECEBIDA"))
+                .andExpect(jsonPath("$.descricao").value("Recebida"));
+    }
+
     @Test
     void testCriarOrdemServico() throws Exception {
         CriarOrdemServicoDTO osDTO = CriarOrdemServicoDTO.builder()

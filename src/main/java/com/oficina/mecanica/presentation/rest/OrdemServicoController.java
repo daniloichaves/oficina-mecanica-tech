@@ -2,6 +2,7 @@ package com.oficina.mecanica.presentation.rest;
 
 import com.oficina.mecanica.application.dto.CriarOrdemServicoDTO;
 import com.oficina.mecanica.application.dto.OrdemServicoDTO;
+import com.oficina.mecanica.application.dto.StatusOrdemServicoDTO;
 import com.oficina.mecanica.application.services.OrdemServicoService;
 import com.oficina.mecanica.domain.entities.StatusOrdemServico;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,6 +38,12 @@ public class OrdemServicoController {
         return ResponseEntity.ok(ordemServicoService.buscarPorId(id));
     }
     
+    @GetMapping("/{id}/status")
+    @Operation(summary = "Consultar situação atual da OS")
+    public ResponseEntity<StatusOrdemServicoDTO> consultarStatus(@PathVariable Long id) {
+        return ResponseEntity.ok(ordemServicoService.consultarStatus(id));
+    }
+
     @GetMapping
     @Operation(summary = "Listar todas as ordens de serviço")
     public ResponseEntity<List<OrdemServicoDTO>> listarTodos() {

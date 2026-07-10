@@ -122,6 +122,17 @@ public class OrdemServicoService {
     }
     
     @Transactional(readOnly = true)
+    public StatusOrdemServicoDTO consultarStatus(Long id) {
+        OrdemServico os = ordemServicoRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
+        return StatusOrdemServicoDTO.builder()
+            .id(os.getId())
+            .status(os.getStatus())
+            .descricao(os.getStatus().getDescricao())
+            .build();
+    }
+
+    @Transactional(readOnly = true)
     public List<OrdemServicoDTO> listarTodos() {
         return ordemServicoRepository.findAll(Pageable.unpaged()).stream()
             .map(this::toDTO)
