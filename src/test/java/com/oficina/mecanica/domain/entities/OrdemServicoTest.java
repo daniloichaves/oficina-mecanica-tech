@@ -69,6 +69,31 @@ class OrdemServicoTest {
     }
     
     @Test
+    void deveRecusarOrcamentoQuandoAguardandoAprovacao() {
+        OrdemServico os = OrdemServico.builder()
+            .cliente(new Cliente())
+            .veiculo(new Veiculo())
+            .status(StatusOrdemServico.AGUARDANDO_APROVACAO)
+            .orcamentoAprovado(false)
+            .build();
+
+        os.recusarOrcamento();
+        assertEquals(StatusOrdemServico.CANCELADA, os.getStatus());
+        assertFalse(os.getOrcamentoAprovado());
+    }
+
+    @Test
+    void naoDeveRecusarOrcamentoForaDeAguardandoAprovacao() {
+        OrdemServico os = OrdemServico.builder()
+            .cliente(new Cliente())
+            .veiculo(new Veiculo())
+            .status(StatusOrdemServico.RECEBIDA)
+            .build();
+
+        assertThrows(IllegalStateException.class, os::recusarOrcamento);
+    }
+
+    @Test
     void deveFinalizar() {
         OrdemServico os = OrdemServico.builder()
             .cliente(new Cliente())

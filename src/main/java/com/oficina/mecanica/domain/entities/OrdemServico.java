@@ -95,6 +95,14 @@ public class OrdemServico {
         this.status = StatusOrdemServico.EM_EXECUCAO;
     }
     
+    public void recusarOrcamento() {
+        if (status != StatusOrdemServico.AGUARDANDO_APROVACAO) {
+            throw new IllegalStateException("Só é possível recusar orçamento quando status é AGUARDANDO_APROVACAO");
+        }
+        this.orcamentoAprovado = false;
+        this.status = StatusOrdemServico.CANCELADA;
+    }
+
     public void iniciarDiagnostico() {
         if (status != StatusOrdemServico.RECEBIDA) {
             throw new IllegalStateException("Só é possível iniciar diagnóstico quando status é RECEBIDA");
