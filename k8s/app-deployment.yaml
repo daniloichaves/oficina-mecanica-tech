@@ -16,6 +16,7 @@ spec:
       containers:
         - name: oficina-app
           image: ghcr.io/daniloichaves/oficina-mecanica:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           envFrom:

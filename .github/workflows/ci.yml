@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -6,7 +6,12 @@ on:
       - main
       - master
       - develop
+      - fase-2
   pull_request:
+  workflow_dispatch:
+
+env:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/oficina-mecanica
 
 jobs:
   build-and-test:
@@ -25,3 +30,66 @@ jobs:
 
       - name: Build, test and coverage check
         run: mvn -B clean verify
+
+  docker:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
+
+  deploy:
+    needs: docker
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: oficina
+
+      # A imagem é buildada e carregada direto no kind (sem pull do GHCR,
+      # que exigiria credenciais no cluster para pacotes privados)
+      - name: Build image and load into kind
+        run: |
+          docker build -t "$IMAGE:${{ github.sha }}" .
+          kind load docker-image "$IMAGE:${{ github.sha }}" --name oficina
+
+      - name: Deploy database and application manifests
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/
+          kubectl -n oficina set image deployment/oficina-app oficina-app="$IMAGE:${{ github.sha }}"
+          kubectl -n oficina rollout status deployment/postgres --timeout=180s
+          kubectl -n oficina rollout status deployment/oficina-app --timeout=300s
+
+      - name: Smoke test
+        run: |
+          kubectl -n oficina port-forward svc/oficina-app 18080:8080 &
+          sleep 5
+          curl -sf http://localhost:18080/actuator/health | grep '"status":"UP"'
