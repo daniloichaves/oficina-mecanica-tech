@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .dispatcherTypeMatchers(DispatcherType.ERROR, DispatcherType.FORWARD).permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/webhooks/**").permitAll()
+                .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                 .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**").permitAll()
                 .requestMatchers("/api/clientes/**", "/api/veiculos/**", "/api/servicos/**", 
                                "/api/pecas/**", "/api/ordens-servico/**", "/api/metricas/**").permitAll()
