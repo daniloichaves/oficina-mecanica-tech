@@ -45,9 +45,9 @@ public class OrdemServicoController {
     }
 
     @GetMapping
-    @Operation(summary = "Listar todas as ordens de serviço")
+    @Operation(summary = "Listar OS ativas ordenadas por prioridade de status (exclui finalizadas/entregues)")
     public ResponseEntity<List<OrdemServicoDTO>> listarTodos() {
-        return ResponseEntity.ok(ordemServicoService.listarTodos());
+        return ResponseEntity.ok(ordemServicoService.listarAtivas());
     }
     
     @GetMapping("/paginado")

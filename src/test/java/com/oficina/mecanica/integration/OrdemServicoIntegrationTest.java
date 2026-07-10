@@ -178,6 +178,31 @@ public class OrdemServicoIntegrationTest extends IntegrationTestBase {
     }
 
     @Test
+    void listagemDeveOrdenarPorStatusEExcluirFinalizadasEEntregues() throws Exception {
+        Long osRecebida = criarOrdemServico();
+        Long osEmDiagnostico = criarOrdemServico();
+        mockMvc.perform(patch("/api/ordens-servico/" + osEmDiagnostico + "/iniciar-diagnostico"))
+                .andExpect(status().isOk());
+        Long osEmExecucao = criarOsAguardandoAprovacao();
+        mockMvc.perform(patch("/api/ordens-servico/" + osEmExecucao + "/aprovar-orcamento"))
+                .andExpect(status().isOk());
+        Long osEntregue = criarOsAguardandoAprovacao();
+        mockMvc.perform(patch("/api/ordens-servico/" + osEntregue + "/aprovar-orcamento"))
+                .andExpect(status().isOk());
+        mockMvc.perform(patch("/api/ordens-servico/" + osEntregue + "/finalizar"))
+                .andExpect(status().isOk());
+        mockMvc.perform(patch("/api/ordens-servico/" + osEntregue + "/entregar"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/ordens-servico"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].id").value(osEmExecucao))
+                .andExpect(jsonPath("$[1].id").value(osEmDiagnostico))
+                .andExpect(jsonPath("$[2].id").value(osRecebida));
+    }
+
+    @Test
     void testCriarOrdemServico() throws Exception {
         CriarOrdemServicoDTO osDTO = CriarOrdemServicoDTO.builder()
                 .clienteId(clienteId)

@@ -141,6 +141,13 @@ public class OrdemServicoService {
     }
 
     @Transactional(readOnly = true)
+    public List<OrdemServicoDTO> listarAtivas() {
+        return ordemServicoRepository.findAtivasOrdenadas().stream()
+            .map(this::toDTO)
+            .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<OrdemServicoDTO> listarTodos() {
         return ordemServicoRepository.findAll(Pageable.unpaged()).stream()
             .map(this::toDTO)

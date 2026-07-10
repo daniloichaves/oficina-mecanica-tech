@@ -22,5 +22,14 @@ public interface OrdemServicoRepository {
     List<OrdemServico> findByClienteId(Long clienteId);
     List<OrdemServico> findByVeiculoId(Long veiculoId);
     List<OrdemServico> findByStatus(StatusOrdemServico status);
+
+    /**
+     * Fila de trabalho da oficina: OS ativas ordenadas por prioridade de status
+     * (Em Execução > Aguardando Aprovação > Em Diagnóstico > Recebida), mais
+     * antigas primeiro. Exclusão lógica: FINALIZADA/ENTREGUE/CANCELADA ficam no
+     * banco mas fora desta listagem.
+     */
+    List<OrdemServico> findAtivasOrdenadas();
+
     Double getTempoMedioExecucao();
 }
