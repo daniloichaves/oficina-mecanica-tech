@@ -151,7 +151,7 @@ public class OrdemServicoService {
     public List<OrdemServicoDTO> listarAtivas() {
         return ordemServicoRepository.findAtivasOrdenadas().stream()
             .map(this::toDTO)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @Transactional(readOnly = true)

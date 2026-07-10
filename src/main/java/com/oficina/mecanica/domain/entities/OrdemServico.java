@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,8 +61,8 @@ public class OrdemServico {
     
     @PrePersist
     protected void onCreate() {
-        dataCriacao = LocalDateTime.now();
-        dataAtualizacao = LocalDateTime.now();
+        dataCriacao = LocalDateTime.now(ZoneId.systemDefault());
+        dataAtualizacao = LocalDateTime.now(ZoneId.systemDefault());
         if (status == null) {
             status = StatusOrdemServico.RECEBIDA;
         }
@@ -72,7 +73,7 @@ public class OrdemServico {
     
     @PreUpdate
     protected void onUpdate() {
-        dataAtualizacao = LocalDateTime.now();
+        dataAtualizacao = LocalDateTime.now(ZoneId.systemDefault());
     }
     
     public void calcularOrcamento() {
@@ -130,6 +131,6 @@ public class OrdemServico {
             throw new IllegalStateException("Só é possível entregar quando status é FINALIZADA");
         }
         this.status = StatusOrdemServico.ENTREGUE;
-        this.dataEntrega = LocalDateTime.now();
+        this.dataEntrega = LocalDateTime.now(ZoneId.systemDefault());
     }
 }
