@@ -227,7 +227,9 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [x] README atualizado (arquitetura, instruções local/K8s/Terraform, collection)
 
 ### Pendências manuais (não automatizáveis)
-- [ ] Validar pipeline no GitHub Actions após push da branch `fase-2`
+- [x] Validar pipeline no GitHub Actions após push da branch `fase-2` (CI/CD verde: build+testes, imagem GHCR e deploy em kind com smoke test)
+- [ ] Renovar o secret `SONAR_TOKEN` do repositório (job SonarQube falhando com "Not authorized"; token expirado — não é problema de código)
+- [ ] Habilitar Dependency Graph + GitHub Advanced Security nas configurações do repo, ou remover o job Dependency Review do `security.yml` (não suportado em repo privado sem GHAS)
 - [ ] Testar `terraform apply` + `kubectl apply -f k8s/` de ponta a ponta com Docker local (validado até `terraform validate` e parse dos manifestos; kind não instalado nesta máquina)
 - [ ] Gravar vídeo de até 15 min (roteiro em `docs/ENTREGA-FASE-2.md`) e publicar no YouTube/Vimeo (não listado)
 - [ ] Inserir o link do vídeo no README e em `docs/ENTREGA-FASE-2.md`
