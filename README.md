@@ -287,6 +287,13 @@ Pipeline em [`.github/workflows/ci.yml`](.github/workflows/ci.yml) com 3 estági
 
 ### Webhooks
 - `POST /api/webhooks/orcamento` - Receber aprovação/recusa externa
+### Webhooks (Fase 2)
+- `POST /api/webhooks/orcamento` - Notificação externa de aprovação/recusa do orçamento (público, sem JWT)
+  ```json
+  { "ordemServicoId": 1, "aprovado": true }
+  ```
+
+> **Notificação por e-mail (Fase 2):** a cada mudança de status da OS o cliente recebe um e-mail. Em desenvolvimento, os e-mails ficam visíveis no Mailhog: http://localhost:8025
 
 ### Métricas
 - `GET /api/metricas/tempo-medio-execucao` - Tempo médio de execução
