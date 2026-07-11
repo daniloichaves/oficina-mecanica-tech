@@ -229,6 +229,7 @@ Pipeline em [`.github/workflows/ci.yml`](.github/workflows/ci.yml) com 3 estági
 ## Collection das APIs
 
 - **Swagger UI:** http://localhost:8080/swagger-ui.html (OpenAPI em `/api-docs`)
+- **Postman:** [`docs/postman/oficina-mecanica.postman_collection.json`](docs/postman/oficina-mecanica.postman_collection.json)
 
 ## Endpoints da API
 
@@ -260,7 +261,7 @@ Pipeline em [`.github/workflows/ci.yml`](.github/workflows/ci.yml) com 3 estági
 - `DELETE /api/servicos/{id}` - Deletar
 
 ### Peças
-- `POST /api/pecas` - Criar peça/insumo
+- `POST /api/pecas` - Criar peça
 - `GET /api/pecas` - Listar todas
 - `GET /api/pecas/paginado` - Listar com paginação (padrão: page=0, size=10)
 - `GET /api/pecas/{id}` - Buscar por ID
@@ -270,11 +271,11 @@ Pipeline em [`.github/workflows/ci.yml`](.github/workflows/ci.yml) com 3 estági
 - `DELETE /api/pecas/{id}` - Deletar
 
 ### Ordens de Serviço
-- `POST /api/ordens-servico` - Criar OS (retorna a identificação única)
-- `GET /api/ordens-servico` - **(Fase 2)** Listar OS ativas ordenadas por prioridade de status (Em Execução > Aguardando Aprovação > Em Diagnóstico > Recebida; mais antigas primeiro; exclui finalizadas/entregues/canceladas)
-- `GET /api/ordens-servico/paginado` - Listar todas com paginação (inclui finalizadas/entregues)
+- `POST /api/ordens-servico` - Criar OS
+- `GET /api/ordens-servico` - Listar OS ativas
+- `GET /api/ordens-servico/paginado` - Listar com paginação
 - `GET /api/ordens-servico/{id}` - Buscar por ID
-- `GET /api/ordens-servico/{id}/status` - **(Fase 2)** Consultar situação atual da OS
+- `GET /api/ordens-servico/{id}/status` - Consultar status
 - `GET /api/ordens-servico/cliente/{clienteId}` - Listar por cliente
 - `GET /api/ordens-servico/veiculo/{veiculoId}` - Listar por veículo
 - `GET /api/ordens-servico/status/{status}` - Listar por status
@@ -284,13 +285,8 @@ Pipeline em [`.github/workflows/ci.yml`](.github/workflows/ci.yml) com 3 estági
 - `PATCH /api/ordens-servico/{id}/finalizar` - Finalizar OS
 - `PATCH /api/ordens-servico/{id}/entregar` - Entregar veículo
 
-### Webhooks (Fase 2)
-- `POST /api/webhooks/orcamento` - Notificação externa de aprovação/recusa do orçamento (público, sem JWT)
-  ```json
-  { "ordemServicoId": 1, "aprovado": true }
-  ```
-
-> **Notificação por e-mail (Fase 2):** a cada mudança de status da OS o cliente recebe um e-mail. Em desenvolvimento, os e-mails ficam visíveis no Mailhog: http://localhost:8025
+### Webhooks
+- `POST /api/webhooks/orcamento` - Receber aprovação/recusa externa
 
 ### Métricas
 - `GET /api/metricas/tempo-medio-execucao` - Tempo médio de execução

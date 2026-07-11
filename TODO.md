@@ -119,6 +119,7 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [x] Configurar Swagger/OpenAPI
 - [x] Documentar todos os endpoints
 - [x] Adicionar exemplos de requisição/resposta
+- [x] Exportar collection Postman em `docs/postman/`
 
 ---
 
