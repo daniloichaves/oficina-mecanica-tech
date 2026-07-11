@@ -1,0 +1,597 @@
+{
+  "info": {
+    "_postman_id": "2f7c3d1b-8d57-4aa1-8c5f-2c9ef26e6c11",
+    "name": "Oficina Mecânica API",
+    "description": "Collection versionada a partir do contrato OpenAPI do projeto. Swagger UI e esta collection cobrem os mesmos endpoints principais do sistema.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "description": "Base da API local"
+    },
+    {
+      "key": "clienteId",
+      "value": "1",
+      "description": "ID de cliente de exemplo"
+    },
+    {
+      "key": "veiculoId",
+      "value": "1",
+      "description": "ID de veículo de exemplo"
+    },
+    {
+      "key": "servicoId",
+      "value": "1",
+      "description": "ID de serviço de exemplo"
+    },
+    {
+      "key": "pecaId",
+      "value": "1",
+      "description": "ID de peça de exemplo"
+    },
+    {
+      "key": "ordemServicoId",
+      "value": "1",
+      "description": "ID de ordem de serviço de exemplo"
+    },
+    {
+      "key": "cpfCnpj",
+      "value": "12345678909",
+      "description": "Documento de exemplo"
+    },
+    {
+      "key": "placa",
+      "value": "ABC1D23",
+      "description": "Placa de exemplo"
+    },
+    {
+      "key": "status",
+      "value": "RECEBIDA",
+      "description": "Status de exemplo para consulta"
+    },
+    {
+      "key": "page",
+      "value": "0",
+      "description": "Página padrão"
+    },
+    {
+      "key": "size",
+      "value": "10",
+      "description": "Tamanho da página"
+    },
+    {
+      "key": "limite",
+      "value": "5",
+      "description": "Limite de estoque baixo"
+    },
+    {
+      "key": "quantidade",
+      "value": "10",
+      "description": "Quantidade usada na atualização de estoque"
+    }
+  ],
+  "item": [
+    {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "Criar cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cpfCnpj\": \"12345678909\",\n  \"nome\": \"Joao da Silva\",\n  \"telefone\": \"(11) 99999-9999\",\n  \"email\": \"joao@example.com\",\n  \"endereco\": \"Rua A, 123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/clientes"
+          }
+        },
+        {
+          "name": "Listar clientes",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/clientes"
+          }
+        },
+        {
+          "name": "Listar clientes paginado",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/clientes/paginado?page={{page}}&size={{size}}"
+          }
+        },
+        {
+          "name": "Buscar cliente por id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/clientes/{{clienteId}}"
+          }
+        },
+        {
+          "name": "Buscar cliente por CPF/CNPJ",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/clientes/cpf/{{cpfCnpj}}"
+          }
+        },
+        {
+          "name": "Atualizar cliente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cpfCnpj\": \"12345678909\",\n  \"nome\": \"Joao da Silva Atualizado\",\n  \"telefone\": \"(11) 98888-8888\",\n  \"email\": \"joao.atualizado@example.com\",\n  \"endereco\": \"Rua B, 456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/clientes/{{clienteId}}"
+          }
+        },
+        {
+          "name": "Deletar cliente",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/clientes/{{clienteId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Veículos",
+      "item": [
+        {
+          "name": "Criar veículo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"ABC1D23\",\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"ano\": 2022,\n  \"clienteId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/veiculos"
+          }
+        },
+        {
+          "name": "Listar veículos",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/veiculos"
+          }
+        },
+        {
+          "name": "Listar veículos paginado",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/veiculos/paginado?page={{page}}&size={{size}}"
+          }
+        },
+        {
+          "name": "Buscar veículo por id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/veiculos/{{veiculoId}}"
+          }
+        },
+        {
+          "name": "Buscar veículo por placa",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/veiculos/placa/{{placa}}"
+          }
+        },
+        {
+          "name": "Listar veículos por cliente",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/veiculos/cliente/{{clienteId}}"
+          }
+        },
+        {
+          "name": "Atualizar veículo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placa\": \"ABC1D23\",\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla Cross\",\n  \"ano\": 2023,\n  \"clienteId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/veiculos/{{veiculoId}}"
+          }
+        },
+        {
+          "name": "Deletar veículo",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/veiculos/{{veiculoId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Serviços",
+      "item": [
+        {
+          "name": "Criar serviço",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Troca de oleo\",\n  \"descricao\": \"Troca completa com filtro\",\n  \"valor\": 180.0,\n  \"tempoEstimadoMinutos\": 60\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/servicos"
+          }
+        },
+        {
+          "name": "Listar serviços",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/servicos"
+          }
+        },
+        {
+          "name": "Listar serviços paginado",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/servicos/paginado?page={{page}}&size={{size}}"
+          }
+        },
+        {
+          "name": "Buscar serviço por id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/servicos/{{servicoId}}"
+          }
+        },
+        {
+          "name": "Atualizar serviço",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Troca de oleo premium\",\n  \"descricao\": \"Troca completa com filtro e inspecao\",\n  \"valor\": 220.0,\n  \"tempoEstimadoMinutos\": 75\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/servicos/{{servicoId}}"
+          }
+        },
+        {
+          "name": "Deletar serviço",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/servicos/{{servicoId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Peças",
+      "item": [
+        {
+          "name": "Criar peça",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Filtro de oleo\",\n  \"descricao\": \"Filtro para manutencao preventiva\",\n  \"valor\": 49.9,\n  \"quantidadeEstoque\": 12\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/pecas"
+          }
+        },
+        {
+          "name": "Listar peças",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/pecas"
+          }
+        },
+        {
+          "name": "Listar peças paginado",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/pecas/paginado?page={{page}}&size={{size}}"
+          }
+        },
+        {
+          "name": "Buscar peça por id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/pecas/{{pecaId}}"
+          }
+        },
+        {
+          "name": "Listar peças com estoque baixo",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/pecas/estoque-baixo?limite={{limite}}"
+          }
+        },
+        {
+          "name": "Atualizar peça",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Filtro de oleo premium\",\n  \"descricao\": \"Filtro para manutencao preventiva\",\n  \"valor\": 59.9,\n  \"quantidadeEstoque\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/pecas/{{pecaId}}"
+          }
+        },
+        {
+          "name": "Atualizar estoque",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/pecas/{{pecaId}}/estoque?quantidade={{quantidade}}"
+          }
+        },
+        {
+          "name": "Deletar peça",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/pecas/{{pecaId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ordens de Serviço",
+      "item": [
+        {
+          "name": "Criar OS",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": 1,\n  \"veiculoId\": 1,\n  \"itensServico\": [\n    {\n      \"servicoId\": 1,\n      \"quantidade\": 1\n    }\n  ],\n  \"itensPeca\": [\n    {\n      \"pecaId\": 1,\n      \"quantidade\": 2\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/ordens-servico"
+          }
+        },
+        {
+          "name": "Listar OS ativas",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/ordens-servico"
+          }
+        },
+        {
+          "name": "Listar OS paginado",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/ordens-servico/paginado?page={{page}}&size={{size}}"
+          }
+        },
+        {
+          "name": "Buscar OS por id",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/ordens-servico/{{ordemServicoId}}"
+          }
+        },
+        {
+          "name": "Consultar status da OS",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/ordens-servico/{{ordemServicoId}}/status"
+          }
+        },
+        {
+          "name": "Listar OS por cliente",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/ordens-servico/cliente/{{clienteId}}"
+          }
+        },
+        {
+          "name": "Listar OS por veículo",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/ordens-servico/veiculo/{{veiculoId}}"
+          }
+        },
+        {
+          "name": "Listar OS por status",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/ordens-servico/status/{{status}}"
+          }
+        },
+        {
+          "name": "Iniciar diagnóstico",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/ordens-servico/{{ordemServicoId}}/iniciar-diagnostico"
+          }
+        },
+        {
+          "name": "Concluir diagnóstico",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/ordens-servico/{{ordemServicoId}}/concluir-diagnostico"
+          }
+        },
+        {
+          "name": "Aprovar orçamento",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/ordens-servico/{{ordemServicoId}}/aprovar-orcamento"
+          }
+        },
+        {
+          "name": "Finalizar OS",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/ordens-servico/{{ordemServicoId}}/finalizar"
+          }
+        },
+        {
+          "name": "Entregar veículo",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/ordens-servico/{{ordemServicoId}}/entregar"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "item": [
+        {
+          "name": "Notificar aprovação ou recusa de orçamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ordemServicoId\": 1,\n  \"aprovado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/webhooks/orcamento"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Métricas",
+      "item": [
+        {
+          "name": "Tempo médio de execução",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/metricas/tempo-medio-execucao"
+          }
+        }
+      ]
+    }
+  ]
+}
