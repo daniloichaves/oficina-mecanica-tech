@@ -6,7 +6,10 @@ Sistema integrado de gestão de oficina mecânica desenvolvido como MVP para o T
 
 **Video de demonstração com todos os endpoints funcionando (Fase 1):** https://www.awesomescreenshot.com/video/52274462?key=d86c873188c071d0944347547ee234dd
 
-**Vídeo demonstrativo da Fase 2 (deploy, CI/CD, APIs, HPA):** https://www.awesomescreenshot.com/video/54542994?key=99327f9bbfe766f7c14307bca56dcd4b
+**Vídeo demonstrativo da Fase 2 (deploy, CI/CD, APIs, HPA):**
+https://www.awesomescreenshot.com/video/54542994?key=99327f9bbfe766f7c14307bca56dcd4b
+
+Vimeo: https://vimeo.com/1210011270?share=copy&fl=sv&fe=ci
 
 ## Fase 2 — Objetivos
 
