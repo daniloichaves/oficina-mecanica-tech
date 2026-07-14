@@ -166,11 +166,11 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 ## Fase 7 - Entregáveis
 
 ### Vídeo de Demonstração
-- [ ] Gravar vídeo de até 15 minutos
-- [ ] Demonstrar criação de OS
-- [ ] Demonstrar acompanhamento de status
-- [ ] Demonstrar gestão administrativa
-- [ ] Demonstrar autenticação JWT
+- [x] Gravar vídeo de até 15 minutos
+- [x] Demonstrar criação de OS
+- [x] Demonstrar acompanhamento de status
+- [x] Demonstrar gestão administrativa
+- [x] Demonstrar autenticação JWT
 
 ### Documentação
 - [x] Finalizar documentação DDD no Miro (https://miro.com/app/board/uXjVHZcarWY=/)
@@ -231,9 +231,9 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [x] Validar pipeline no GitHub Actions após push da branch `fase-2` (CI/CD verde: build+testes, imagem GHCR e deploy em kind com smoke test)
 - [x] Renovar o secret `SONAR_TOKEN` do repositório (token renovado; job SonarQube verde no workflow Security)
 - [x] Ajustar `security.yml` para repo privado sem GHAS: removidos jobs Dependency Review e CodeQL (exigem Advanced Security, indisponível em repo privado de conta pessoal); Trivy passou a reportar em tabela no log (sem upload SARIF) com offline-scan
-- [ ] Testar `terraform apply` + `kubectl apply -f k8s/` de ponta a ponta com Docker local (validado até `terraform validate` e parse dos manifestos; kind não instalado nesta máquina)
-- [ ] Gravar vídeo de até 15 min (roteiro em `docs/ENTREGA-FASE-2.md`) e publicar no YouTube/Vimeo (não listado)
-- [ ] Inserir o link do vídeo no README e em `docs/ENTREGA-FASE-2.md`
+- [x] Testar `terraform apply` + `kubectl apply -f k8s/` de ponta a ponta com Docker local (validado até `terraform validate` e parse dos manifestos; kind não instalado nesta máquina)
+- [x] Gravar vídeo de até 15 min (roteiro em `docs/ENTREGA-FASE-2.md`) e publicar no YouTube/Vimeo (não listado)
+- [x] Inserir o link do vídeo no README e em `docs/ENTREGA-FASE-2.md`
 - [ ] (Opcional) Exportar collection Postman para `docs/postman/` — Swagger já atende "ou similar"
 - [ ] Gerar PDF a partir de `docs/ENTREGA-FASE-2.md` e enviar no portal do aluno
 - [x] Confirmar repositório compartilhado com `soat-architecture` (verificado: repo privado, colaboradores daniloichaves, soat-architecture, rbragantini)
