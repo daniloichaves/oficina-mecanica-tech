@@ -8,8 +8,7 @@
 - **Desenho da arquitetura:** seção "Fase 2 — Objetivos" do [README](../README.md) (diagrama Mermaid com componentes, infraestrutura e fluxo de deploy)
 - **Collection das APIs:** Swagger UI (`/swagger-ui.html`) / OpenAPI (`/api-docs`) / Postman versionado em [`docs/postman/oficina-mecanica.postman_collection.json`](../docs/postman/oficina-mecanica.postman_collection.json)
 - **Collection das APIs:** Swagger UI (`/swagger-ui.html`) / OpenAPI (`/api-docs`)
-- **Vídeo (até 15 min):** _[PENDENTE — inserir link YouTube/Vimeo público ou não listado]_
-
+- **Vídeo (até 15 min):** https://vimeo.com/1210011270?share=copy&fl=sv&fe=ci
 ## Roteiro sugerido do vídeo
 
 1. **Deploy da aplicação** — `cd infra && terraform apply` (cluster kind + banco) e `kubectl apply -f k8s/`; mostrar pods subindo (`kubectl -n oficina get pods -w`).
