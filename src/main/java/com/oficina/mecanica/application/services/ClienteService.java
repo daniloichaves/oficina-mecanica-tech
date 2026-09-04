@@ -2,6 +2,7 @@ package com.oficina.mecanica.application.services;
 
 import com.oficina.mecanica.application.dto.ClienteDTO;
 import com.oficina.mecanica.domain.entities.Cliente;
+import com.oficina.mecanica.domain.entities.StatusCliente;
 import com.oficina.mecanica.domain.repositories.ClienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class ClienteService {
             .telefone(dto.getTelefone())
             .email(dto.getEmail())
             .endereco(dto.getEndereco())
+            .status(dto.getStatus() == null ? StatusCliente.ATIVO : dto.getStatus())
             .build();
         cliente = clienteRepository.save(cliente);
         return toDTO(cliente);
@@ -49,6 +51,9 @@ public class ClienteService {
         cliente.setTelefone(dto.getTelefone());
         cliente.setEmail(dto.getEmail());
         cliente.setEndereco(dto.getEndereco());
+        if (dto.getStatus() != null) {
+            cliente.setStatus(dto.getStatus());
+        }
         
         cliente = clienteRepository.save(cliente);
         return toDTO(cliente);
@@ -96,6 +101,7 @@ public class ClienteService {
             .telefone(cliente.getTelefone())
             .email(cliente.getEmail())
             .endereco(cliente.getEndereco())
+            .status(cliente.getStatus())
             .build();
     }
 }

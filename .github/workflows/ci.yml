@@ -87,9 +87,10 @@ jobs:
           kubectl -n oficina set image deployment/oficina-app oficina-app="$IMAGE:${{ github.sha }}"
           kubectl -n oficina rollout status deployment/postgres --timeout=180s
           kubectl -n oficina rollout status deployment/oficina-app --timeout=300s
+          kubectl -n oficina rollout status deployment/traefik --timeout=180s
 
-      - name: Smoke test
+      - name: Smoke test through Traefik API Gateway
         run: |
-          kubectl -n oficina port-forward svc/oficina-app 18080:8080 &
+          kubectl -n oficina port-forward svc/traefik 18080:80 &
           sleep 5
           curl -sf http://localhost:18080/actuator/health | grep '"status":"UP"'

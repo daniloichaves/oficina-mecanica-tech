@@ -1,5 +1,6 @@
 package com.oficina.mecanica.application.dto;
 
+import com.oficina.mecanica.domain.entities.StatusCliente;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,4 +25,5 @@ public class ClienteDTO {
     
     private String email;
     private String endereco;
+    private StatusCliente status;
 }

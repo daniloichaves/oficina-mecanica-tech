@@ -37,6 +37,11 @@ public class Cliente {
     
     @Column
     private String endereco;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private StatusCliente status = StatusCliente.ATIVO;
     
     @Column(name = "data_cadastro", nullable = false, updatable = false)
     private LocalDateTime dataCadastro;
@@ -50,6 +55,9 @@ public class Cliente {
     
     @PrePersist
     protected void onCreate() {
+        if (status == null) {
+            status = StatusCliente.ATIVO;
+        }
         dataCadastro = LocalDateTime.now();
         dataAtualizacao = LocalDateTime.now();
     }
