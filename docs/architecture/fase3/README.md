@@ -2,6 +2,7 @@
 
 - [Componentes](componentes.md)
 - [Sequências](sequencias.md)
+- [Autenticação por CPF e validação de JWT no gateway](autenticacao.md)
 - [Modelo relacional](modelo-relacional.md)
 - [RFC 001 — AWS](rfc/001-aws.md)
 - [RFC 002 — PostgreSQL gerenciado](rfc/002-postgresql-rds.md)

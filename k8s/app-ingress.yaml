@@ -1,7 +1,8 @@
+# Rotas públicas: health, documentação, webhook externo e login por CPF.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: oficina-api
+  name: oficina-api-public
   namespace: oficina
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
@@ -10,7 +11,65 @@ spec:
   rules:
     - http:
         paths:
-          - path: /
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-lambda
+                port:
+                  number: 8081
+          - path: /actuator/health
+            pathType: Prefix
+            backend:
+              service:
+                name: oficina-app
+                port:
+                  number: 8080
+          - path: /swagger-ui.html
+            pathType: Exact
+            backend:
+              service:
+                name: oficina-app
+                port:
+                  number: 8080
+          - path: /swagger-ui
+            pathType: Prefix
+            backend:
+              service:
+                name: oficina-app
+                port:
+                  number: 8080
+          - path: /api-docs
+            pathType: Prefix
+            backend:
+              service:
+                name: oficina-app
+                port:
+                  number: 8080
+          - path: /api/webhooks
+            pathType: Prefix
+            backend:
+              service:
+                name: oficina-app
+                port:
+                  number: 8080
+---
+# Rotas de negócio: o Traefik chama a função de autenticação (ForwardAuth) e só
+# encaminha à aplicação se o Bearer JWT for válido. Sem token → 401 no gateway.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: oficina-api-protected
+  namespace: oficina
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: lambda-auth@file
+spec:
+  ingressClassName: traefik
+  rules:
+    - http:
+        paths:
+          - path: /api
             pathType: Prefix
             backend:
               service:

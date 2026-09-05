@@ -23,6 +23,26 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  auth:
+    build:
+      context: ./fase3-repositories/auth-lambda
+      dockerfile: Dockerfile.local
+    container_name: oficina-auth
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: oficina_mecanica
+      DB_USER: oficina
+      DB_PASSWORD: oficina123
+      DB_SSL: "false"
+      JWT_SECRET: oficinaMecanicaSecretKeyForJWTTokenGeneration2024
+      JWT_EXPIRATION_SECONDS: 3600
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   app:
     build: .
     container_name: oficina-app

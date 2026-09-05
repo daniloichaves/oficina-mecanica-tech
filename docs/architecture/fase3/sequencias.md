@@ -24,6 +24,29 @@ sequenceDiagram
     end
 ```
 
+## Acesso a rota protegida (ForwardAuth)
+
+```mermaid
+sequenceDiagram
+    actor C as Cliente
+    participant T as Traefik
+    participant L as Lambda Auth
+    participant A as Aplicação
+    C->>T: GET /api/** (Authorization: Bearer)
+    T->>L: ForwardAuth (Authorization, X-Correlation-ID)
+    alt token ausente, inválido ou expirado
+        L-->>T: 401 + WWW-Authenticate
+        T-->>C: 401
+    else token válido
+        L-->>T: 200 + X-Auth-Client-Id, X-Auth-Cpf
+        T->>A: requisição original + X-Auth-*
+        A->>A: valida JWT (Spring Security)
+        A-->>C: 200
+    end
+```
+
+Fluxos de sucesso e falha detalhados em [autenticacao.md](autenticacao.md).
+
 ## Abertura de ordem de serviço
 
 ```mermaid

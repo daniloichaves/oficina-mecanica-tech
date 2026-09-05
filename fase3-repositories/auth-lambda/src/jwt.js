@@ -19,6 +19,8 @@ export function verifyJwt(token, secret, nowSeconds = Math.floor(Date.now() / 10
   if (received.length !== expected.length || !crypto.timingSafeEqual(received, expected)) {
     throw new Error('Assinatura inválida');
   }
+  const parsedHeader = JSON.parse(Buffer.from(header, 'base64url').toString('utf8'));
+  if (parsedHeader.alg !== 'HS256') throw new Error('Algoritmo não suportado');
   const claims = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
   if (!claims.exp || claims.exp <= nowSeconds) throw new Error('Token expirado');
   return claims;

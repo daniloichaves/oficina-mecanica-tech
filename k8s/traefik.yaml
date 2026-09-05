@@ -32,6 +32,8 @@ spec:
             - --providers.kubernetesingress.namespaces=oficina
             - --providers.kubernetesingress.ingressclass=traefik
             - --providers.kubernetesingress.allowemptyservices=false
+            - --providers.file.filename=/etc/traefik/dynamic/dynamic.yml
+            - --providers.file.watch=true
             - --api.dashboard=true
             - --api.insecure=false
             - --ping=true
@@ -69,6 +71,14 @@ spec:
             readOnlyRootFilesystem: true
             capabilities:
               drop: [ALL]
+          volumeMounts:
+            - name: dynamic
+              mountPath: /etc/traefik/dynamic
+              readOnly: true
+      volumes:
+        - name: dynamic
+          configMap:
+            name: traefik-dynamic
 ---
 apiVersion: v1
 kind: Service

@@ -127,6 +127,7 @@ resource "helm_release" "traefik" {
               lambda-auth = {
                 forwardAuth = {
                   address             = var.auth_function_url
+                  authRequestHeaders  = ["Authorization", "X-Correlation-ID"]
                   authResponseHeaders = ["X-Auth-Client-Id", "X-Auth-Cpf", "X-Correlation-ID"]
                   trustForwardHeader  = true
                 }

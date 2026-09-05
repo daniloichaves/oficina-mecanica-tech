@@ -7,11 +7,13 @@ on:
       - master
       - develop
       - fase-2
+      - feat/fase-3
   pull_request:
   workflow_dispatch:
 
 env:
   IMAGE: ghcr.io/${{ github.repository_owner }}/oficina-mecanica
+  AUTH_IMAGE: ghcr.io/${{ github.repository_owner }}/oficina-auth-lambda
 
 jobs:
   build-and-test:
@@ -31,8 +33,29 @@ jobs:
       - name: Build, test and coverage check
         run: mvn -B clean verify
 
+  auth-lambda-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: fase3-repositories/auth-lambda
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: fase3-repositories/auth-lambda/package-lock.json
+
+      - name: Test authentication function
+        run: |
+          npm ci
+          npm test
+
   docker:
-    needs: build-and-test
+    needs: [build-and-test, auth-lambda-test]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -75,18 +98,23 @@ jobs:
 
       # A imagem é buildada e carregada direto no kind (sem pull do GHCR,
       # que exigiria credenciais no cluster para pacotes privados)
-      - name: Build image and load into kind
+      - name: Build images and load into kind
         run: |
           docker build -t "$IMAGE:${{ github.sha }}" .
+          docker build -t "$AUTH_IMAGE:${{ github.sha }}" \
+            -f fase3-repositories/auth-lambda/Dockerfile.local fase3-repositories/auth-lambda
           kind load docker-image "$IMAGE:${{ github.sha }}" --name oficina
+          kind load docker-image "$AUTH_IMAGE:${{ github.sha }}" --name oficina
 
       - name: Deploy database and application manifests
         run: |
           kubectl apply -f k8s/namespace.yaml
           kubectl apply -f k8s/
           kubectl -n oficina set image deployment/oficina-app oficina-app="$IMAGE:${{ github.sha }}"
+          kubectl -n oficina set image deployment/auth-lambda auth-lambda="$AUTH_IMAGE:${{ github.sha }}"
           kubectl -n oficina rollout status deployment/postgres --timeout=180s
           kubectl -n oficina rollout status deployment/oficina-app --timeout=300s
+          kubectl -n oficina rollout status deployment/auth-lambda --timeout=180s
           kubectl -n oficina rollout status deployment/traefik --timeout=180s
 
       - name: Smoke test through Traefik API Gateway
@@ -94,3 +122,41 @@ jobs:
           kubectl -n oficina port-forward svc/traefik 18080:80 &
           sleep 5
           curl -sf http://localhost:18080/actuator/health | grep '"status":"UP"'
+
+      - name: Authentication flow test (ForwardAuth + JWT por CPF)
+        run: |
+          GW=http://localhost:18080
+          status() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
+
+          # cliente de teste (CPF válido) diretamente no banco do cluster
+          kubectl -n oficina exec deploy/postgres -- psql -U oficina -d oficina_mecanica -c \
+            "INSERT INTO clientes (cpf_cnpj, nome, telefone, email, status, data_cadastro)
+             VALUES ('52998224725','Cliente CI','11999999999','ci@oficina.local','ATIVO',NOW()),
+                    ('98765432100','Cliente Bloqueado','11999999999','bloq@oficina.local','BLOQUEADO',NOW())
+             ON CONFLICT (cpf_cnpj) DO NOTHING;"
+
+          echo "1) rota protegida sem token -> 401 no gateway"
+          test "$(status $GW/api/clientes)" = "401"
+
+          echo "2) token adulterado -> 401"
+          test "$(status -H 'Authorization: Bearer abc.def.ghi' $GW/api/clientes)" = "401"
+
+          echo "3) CPF inválido -> 400"
+          test "$(status -X POST -H 'Content-Type: application/json' -d '{"cpf":"11111111111"}' $GW/auth)" = "400"
+
+          echo "4) cliente inexistente -> 404"
+          test "$(status -X POST -H 'Content-Type: application/json' -d '{"cpf":"12345678909"}' $GW/auth)" = "404"
+
+          echo "5) cliente bloqueado -> 403"
+          test "$(status -X POST -H 'Content-Type: application/json' -d '{"cpf":"98765432100"}' $GW/auth)" = "403"
+
+          echo "6) login por CPF -> 200 com token"
+          TOKEN=$(curl -sf -X POST -H 'Content-Type: application/json' -d '{"cpf":"52998224725"}' $GW/auth \
+            | sed -E 's/.*"token":"([^"]+)".*/\1/')
+          test -n "$TOKEN"
+
+          echo "7) rota protegida com token válido -> 200"
+          test "$(status -H "Authorization: Bearer $TOKEN" $GW/api/clientes)" = "200"
+
+          echo "8) webhook público continua sem exigir token (400 = validação do corpo, não 401)"
+          test "$(status -X POST -H 'Content-Type: application/json' -d '{}' $GW/api/webhooks/orcamento)" != "401"

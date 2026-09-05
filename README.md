@@ -54,9 +54,22 @@ exportação aos repositórios independentes ficam em [`fase3-repositories/`](fa
 - [RDS PostgreSQL gerenciado](https://github.com/daniloichaves/oficina-mecanica-database-infra);
 - [Aplicação principal](https://github.com/daniloichaves/oficina-mecanica-tech).
 
-As APIs de negócio exigem Bearer JWT. O login legado inseguro está desativado por
-padrão e pode ser habilitado somente para compatibilidade local com
-`LEGACY_AUTH_ENABLED=true`.
+As APIs de negócio (`/api/**`) exigem Bearer JWT emitido pela função de autenticação por
+CPF. O Traefik valida o token no gateway (middleware `lambda-auth@file`, ForwardAuth)
+antes de encaminhar à aplicação, que valida o mesmo token novamente via Spring Security.
+Rotas públicas: `/auth` (login por CPF), `/actuator/health`, Swagger e `/api/webhooks/**`.
+Localmente a função roda como container (`k8s/auth-lambda.yaml`, serviço `auth` no
+docker-compose); na AWS, como Lambda com Function URL. Fluxos de sucesso e falha, testes e
+exemplos: [`docs/architecture/fase3/autenticacao.md`](docs/architecture/fase3/autenticacao.md).
+
+```bash
+TOKEN=$(curl -s -X POST http://localhost:30080/auth -H 'Content-Type: application/json' \
+  -d '{"cpf":"52998224725"}' | jq -r .token)
+curl -H "Authorization: Bearer $TOKEN" http://localhost:30080/api/clientes
+```
+
+O login legado inseguro (`POST /api/auth/login`) está desativado por padrão e pode ser
+habilitado somente para compatibilidade local com `LEGACY_AUTH_ENABLED=true`.
 
 ### Decisões de arquitetura (Fase 2)
 
@@ -203,6 +216,7 @@ wsl docker compose up -d
 Isso iniciará:
 - PostgreSQL na porta 5432
 - Mailhog (SMTP dev) nas portas 1025/8025 — UI em http://localhost:8025
+- Função de autenticação por CPF na porta 8081 (`POST /auth`)
 - Aplicação Spring Boot na porta 8080
 
 ### Verificar logs
@@ -228,7 +242,7 @@ kubectl -n oficina rollout status deployment/traefik
 curl http://localhost:30080/actuator/health
 ```
 
-Sobe: namespace `oficina`, PostgreSQL (PVC + Deployment + Service), Mailhog, aplicação (2 réplicas, probes no `/actuator/health`), Traefik (2 réplicas), Ingress e HPA (2–6 réplicas, CPU 70% / memória 80%).
+Sobe: namespace `oficina`, PostgreSQL (PVC + Deployment + Service), Mailhog, função de autenticação (`auth-lambda`), aplicação (2 réplicas, probes no `/actuator/health`), Traefik (2 réplicas, com middleware ForwardAuth via ConfigMap `traefik-dynamic`), Ingress público/protegido e HPA (2–6 réplicas, CPU 70% / memória 80%).
 
 O Traefik é o único ponto de entrada HTTP do cluster no NodePort `30080` e encaminha as requisições ao serviço interno `oficina-app`. O provider observa somente o namespace `oficina`, os logs de acesso são JSON e o dashboard administrativo não é publicado externamente. Em cloud, o Service pode ser alterado para `LoadBalancer` sem expor diretamente a aplicação.
 
@@ -246,9 +260,9 @@ cd infra && terraform init && terraform apply
 
 Pipeline em [`.github/workflows/ci.yml`](.github/workflows/ci.yml) com 3 estágios:
 
-1. **build-and-test** — `mvn clean verify` (testes + gate de cobertura JaCoCo);
+1. **build-and-test** — `mvn clean verify` (testes + gate de cobertura JaCoCo) e **auth-lambda-test** (`npm test` da função de autenticação);
 2. **docker** — build e push da imagem para `ghcr.io/daniloichaves/oficina-mecanica` (`latest` + SHA);
-3. **deploy** — cria cluster kind no runner, carrega a imagem, aplica `k8s/` (banco + app), aguarda os rollouts e roda smoke test no `/actuator/health`.
+3. **deploy** — cria cluster kind no runner, carrega as imagens da aplicação e da função de autenticação, aplica `k8s/`, aguarda os rollouts, roda smoke test no `/actuator/health` e o teste ponta a ponta de autenticação via Traefik (401 sem token, 400/404/403 no login, 200 com token, webhook público).
 
 ## Collection das APIs
 

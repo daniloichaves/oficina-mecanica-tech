@@ -1,0 +1,23 @@
+# Configuração dinâmica do Traefik (file provider).
+# Define o middleware `lambda-auth@file`, referenciado pelo Ingress protegido:
+# cada requisição a /api/** é encaminhada à função de autenticação antes de chegar à aplicação.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-dynamic
+  namespace: oficina
+data:
+  dynamic.yml: |
+    http:
+      middlewares:
+        lambda-auth:
+          forwardAuth:
+            address: http://auth-lambda.oficina.svc.cluster.local:8081/auth
+            trustForwardHeader: true
+            authRequestHeaders:
+              - Authorization
+              - X-Correlation-ID
+            authResponseHeaders:
+              - X-Auth-Client-Id
+              - X-Auth-Cpf
+              - X-Correlation-ID

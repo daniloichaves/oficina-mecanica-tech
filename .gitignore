@@ -39,3 +39,6 @@ Thumbs.db
 
 # Test scripts
 test-flow.sh
+
+# Claude local settings
+.claude/

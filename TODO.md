@@ -270,8 +270,8 @@ Elevar a aplicação a um nível de operação corporativa, utilizando práticas
 - [x] Consultar a existência do cliente na base de dados — SQL parametrizado
 - [x] Consultar e validar o status do cliente — `ATIVO`, `INATIVO` ou `BLOQUEADO`
 - [x] Gerar e devolver um token JWT válido para consumo das APIs protegidas
-- [ ] Configurar validação do JWT nas rotas protegidas pelo API Gateway
-- [ ] Documentar e testar os fluxos de sucesso e falha da autenticação
+- [x] Configurar validação do JWT nas rotas protegidas pelo API Gateway — middleware `lambda-auth@file` (ForwardAuth) em `k8s/traefik-dynamic.yaml` (kind) e no Helm do Traefik (EKS); Ingress público × protegido; `/api/webhooks` permanece público
+- [x] Documentar e testar os fluxos de sucesso e falha da autenticação — `docs/architecture/fase3/autenticacao.md`; 19 testes em `auth-lambda/test`; step *Authentication flow test* no CI (ponta a ponta via Traefik)
 
 ### Estrutura de Repositórios
 
