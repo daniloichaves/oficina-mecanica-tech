@@ -1,0 +1,17 @@
+{
+  "name": "oficina-auth-lambda",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "package": "npm ci --omit=dev"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.883.0",
+    "pg": "^8.16.3"
+  }
+}

@@ -1,0 +1,11 @@
+environment                    = "production"
+vpc_cidr                       = "10.30.0.0/16"
+cluster_endpoint_allowed_cidrs = ["203.0.113.10/32"] # substituir pelo CIDR administrativo antes do apply
+node_min_size                  = 3
+node_desired_size              = 3
+node_max_size                  = 10
+node_instance_types            = ["m7i-flex.large"]
+traefik_chart_version          = "41.4.0"
+metrics_server_chart_version   = "3.13.0"
+datadog_chart_version          = "3.215.1"
+auth_function_url              = "https://REPLACE_ME.lambda-url.sa-east-1.on.aws/"

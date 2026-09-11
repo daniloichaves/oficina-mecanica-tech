@@ -5,6 +5,11 @@ metadata:
   namespace: oficina
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   selector:
     matchLabels:
       app: oficina-app
@@ -12,7 +17,20 @@ spec:
     metadata:
       labels:
         app: oficina-app
+      annotations:
+        ad.datadoghq.com/oficina-app.logs: '[{"source":"java","service":"oficina-mecanica"}]'
+        ad.datadoghq.com/oficina-app.checks: '{"openmetrics":{"instances":[{"openmetrics_endpoint":"http://%%host%%:8080/actuator/prometheus","namespace":"oficina","metrics":[".*"]}]}}'
     spec:
+      terminationGracePeriodSeconds: 30
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: oficina-app
+                topologyKey: kubernetes.io/hostname
       containers:
         - name: oficina-app
           image: ghcr.io/daniloichaves/oficina-mecanica:latest
@@ -24,6 +42,17 @@ spec:
                 name: oficina-app-config
             - secretRef:
                 name: oficina-app-secret
+          env:
+            - name: APP_ENVIRONMENT
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: DD_SERVICE
+              value: oficina-mecanica
+            - name: DD_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           resources:
             requests:
               cpu: 250m
@@ -37,9 +66,21 @@ spec:
               port: 8080
             initialDelaySeconds: 30
             periodSeconds: 10
+            failureThreshold: 3
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8080
             initialDelaySeconds: 60
             periodSeconds: 15
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            periodSeconds: 10
+            failureThreshold: 18
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sh", "-c", "sleep 10"]

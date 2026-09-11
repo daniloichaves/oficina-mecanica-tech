@@ -248,3 +248,165 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [x] Testes de Integração: Concluído (47 testes de integração passando)
 - [x] Cobertura de Testes: Concluído (90% em domínios críticos: CpfCnpj, Placa)
 - [ ] Entregáveis: Pendente
+
+---
+
+## FASE 3 - Tech Challenge
+
+**Peso:** 60% da nota de todas as disciplinas da fase
+
+### Objetivo
+
+Elevar a aplicação a um nível de operação corporativa, utilizando práticas de cloud, infraestrutura como código, segurança e observabilidade, com suporte à expansão da oficina para múltiplas unidades.
+
+### Autenticação e API Gateway
+
+- [x] Escolher e implementar um API Gateway — Traefik 3.7.1 no Kubernetes
+- [x] Configurar o API Gateway para controle e roteamento das APIs — Ingress direcionando para o Service interno da aplicação
+- [x] Identificar e proteger as rotas sensíveis da aplicação — APIs de negócio exigem JWT
+- [x] Implementar autenticação de clientes via CPF — código em `fase3-repositories/auth-lambda`
+- [x] Criar Function Serverless para autenticação — Node.js 22 e Terraform AWS Lambda
+- [x] Validar o formato e os dígitos verificadores do CPF na Function
+- [x] Consultar a existência do cliente na base de dados — SQL parametrizado
+- [x] Consultar e validar o status do cliente — `ATIVO`, `INATIVO` ou `BLOQUEADO`
+- [x] Gerar e devolver um token JWT válido para consumo das APIs protegidas
+- [x] Configurar validação do JWT nas rotas protegidas pelo API Gateway — middleware `lambda-auth@file` (ForwardAuth) em `k8s/traefik-dynamic.yaml` (kind) e no Helm do Traefik (EKS); Ingress público × protegido; `/api/webhooks` permanece público
+- [x] Documentar e testar os fluxos de sucesso e falha da autenticação — `docs/architecture/fase3/autenticacao.md`; 19 testes em `auth-lambda/test`; step *Authentication flow test* no CI (ponta a ponta via Traefik)
+
+### Estrutura de Repositórios
+
+- [x] Separar a solução em 4 repositórios Git
+- [x] Criar repositório 1: Lambda/Function Serverless — https://github.com/daniloichaves/oficina-mecanica-auth-lambda
+- [x] Criar repositório 2: infraestrutura Kubernetes com Terraform — https://github.com/daniloichaves/oficina-mecanica-kubernetes-infra
+- [x] Criar repositório 3: infraestrutura do banco de dados gerenciado com Terraform — https://github.com/daniloichaves/oficina-mecanica-database-infra
+- [x] Criar repositório 4: aplicação principal executada no Kubernetes — https://github.com/daniloichaves/oficina-mecanica-tech
+- [x] Definir responsabilidades, dependências e estratégia de versionamento entre os repositórios
+- [ ] Adicionar o usuário `soat-architecture` aos 4 repositórios — acesso ativo no principal; convites pendentes nos três novos
+
+### CI/CD e Proteção de Branches
+
+- [x] Implementar pipeline de CI/CD no repositório da Function Serverless
+- [x] Implementar pipeline de CI/CD no repositório da infraestrutura Kubernetes
+- [x] Implementar pipeline de CI/CD no repositório da infraestrutura do banco de dados
+- [x] Implementar pipeline de CI/CD no repositório da aplicação principal
+- [x] Configurar build e testes automáticos em Pull Requests — workflow atual executa `mvn clean verify`
+- [ ] Configurar deploy automático para o ambiente de homologação
+- [ ] Configurar deploy automático para o ambiente de produção
+- [x] Proteger a branch `main`/`master` dos 4 repositórios contra commits diretos
+- [x] Exigir Pull Request com uma aprovação para merge nos 4 repositórios
+- [ ] Definir secrets, variáveis e aprovações por ambiente sem expor credenciais
+- [ ] Validar a execução completa de todas as pipelines na plataforma Git
+
+### Infraestrutura Cloud
+
+- [x] Escolher e documentar o provedor de nuvem — AWS, conforme RFC 001
+- [ ] Provisionar API Gateway
+- [ ] Provisionar e publicar a Function Serverless de autenticação
+- [ ] Provisionar banco de dados gerenciado
+- [ ] Provisionar cluster Kubernetes com escalabilidade
+- [x] Implementar toda a infraestrutura aplicável com Terraform — projetos exportáveis para EKS/Traefik/Datadog, RDS e Lambda
+- [ ] Configurar estado remoto e locking do Terraform
+- [ ] Configurar redes, sub-redes, regras de firewall/security groups e acessos privados
+- [ ] Configurar gerenciamento seguro de secrets e credenciais
+- [ ] Configurar ambientes separados de homologação e produção
+- [ ] Validar o provisionamento e o deploy de ponta a ponta na nuvem
+
+### Banco de Dados e Modelo Relacional
+
+- [x] Revisar e melhorar a modelagem do banco de dados — status do cliente e schema versionado
+- [x] Garantir consistência por meio de chaves, constraints e integridade referencial
+- [x] Revisar índices e consultas críticas para melhorar a performance
+- [x] Definir estratégia de migrations versionadas — Flyway
+- [x] Definir estratégia de backup, restauração e alta disponibilidade — RDS Multi-AZ, snapshots e retenção por ambiente
+- [x] Criar diagrama entidade-relacionamento atualizado
+- [x] Documentar entidades, relacionamentos e cardinalidades
+- [x] Elaborar justificativa formal para a escolha do banco de dados
+- [x] Documentar os ajustes realizados no modelo relacional
+
+### Kubernetes e Escalabilidade
+
+- [x] Criar/revisar manifests ou charts para a aplicação principal — manifests Kubernetes versionados em `k8s/`
+- [x] Configurar requests e limits de CPU e memória
+- [x] Configurar liveness, readiness e startup probes
+- [x] Implementar Horizontal Pod Autoscaler (HPA) — 2 a 6 réplicas por CPU/memória
+- [x] Definir política de disponibilidade e distribuição dos pods — anti-affinity e PodDisruptionBudget
+- [x] Configurar atualização gradual e rollback da aplicação — RollingUpdate sem indisponibilidade
+- [ ] Validar escalabilidade e alta disponibilidade do cluster
+
+### Monitoramento e Observabilidade
+
+- [ ] Escolher e integrar Datadog, New Relic ou ferramenta equivalente
+- [ ] Monitorar a latência das APIs
+- [ ] Monitorar CPU e memória do Kubernetes
+- [ ] Monitorar healthchecks e uptime
+- [ ] Criar alertas para falhas no processamento de ordens de serviço
+- [x] Implementar logs estruturados em JSON — aplicação e Traefik
+- [x] Implementar identificador de correlação entre requisições, logs e serviços — `X-Correlation-ID` e MDC
+- [ ] Implementar tracing distribuído para os fluxos críticos
+- [ ] Monitorar erros e falhas nas integrações
+- [ ] Criar dashboard com o volume diário de ordens de serviço
+- [ ] Criar dashboard com o tempo médio de execução por status (Diagnóstico, Execução e Finalização)
+- [ ] Criar dashboard com erros e falhas nas integrações
+- [ ] Validar métricas, logs, traces, alertas e dashboards em execução
+
+### Documentação da Arquitetura
+
+- [x] Criar diagrama de componentes com visão de nuvem, APIs, banco e monitoramento
+- [x] Criar diagrama de sequência do fluxo de autenticação
+- [x] Criar diagrama de sequência do fluxo de abertura de ordem de serviço
+- [x] Criar RFC para a escolha do provedor de nuvem — AWS
+- [x] Criar RFC para a escolha do banco de dados — RDS PostgreSQL
+- [x] Criar RFC para a estratégia de autenticação — Lambda, CPF e JWT
+- [x] Criar ADR para o padrão de comunicação entre componentes
+- [x] Criar ADR para o uso e a configuração do HPA
+- [x] Registrar outras decisões arquiteturais permanentes em ADRs — Traefik
+- [x] Revisar e publicar o diagrama ER e a explicação dos relacionamentos
+- [x] Centralizar os links de toda a documentação arquitetural
+
+### README dos Repositórios
+
+- [ ] Documentar claramente o propósito de cada um dos 4 repositórios
+- [ ] Listar as tecnologias utilizadas em cada repositório
+- [ ] Documentar os passos de execução local
+- [ ] Documentar os passos de provisionamento e deploy
+- [ ] Adicionar o diagrama da arquitetura específica de cada repositório
+- [x] Adicionar link para Swagger e/ou collection Postman das APIs — disponível no README da aplicação
+- [x] Adicionar Dockerfile nos repositórios aplicáveis — concluído no repositório atual da aplicação
+- [ ] Documentar as pipelines de CI/CD e os ambientes
+- [ ] Adicionar links para os deploys ativos, quando aplicável
+- [ ] Validar todas as instruções dos READMEs em ambiente limpo
+
+### Vídeo de Demonstração
+
+- [ ] Preparar roteiro para vídeo de até 15 minutos
+- [ ] Demonstrar autenticação com CPF
+- [ ] Demonstrar execução da pipeline de CI/CD
+- [ ] Demonstrar o deploy automatizado
+- [ ] Demonstrar o consumo das APIs protegidas
+- [ ] Demonstrar o dashboard de monitoramento com análise ao vivo
+- [ ] Demonstrar logs e traces em execução
+- [ ] Publicar o vídeo no YouTube ou Vimeo como público ou não listado
+- [ ] Registrar o link final do vídeo na documentação de entrega
+
+### Documento de Entrega e Portal do Aluno
+
+- [ ] Criar um documento único de entrega em PDF
+- [ ] Incluir no PDF os links dos 4 repositórios
+- [ ] Incluir no PDF o link do vídeo de demonstração
+- [ ] Incluir no PDF os links das documentações
+- [ ] Incluir no PDF a confirmação de que `soat-architecture` foi adicionado aos 4 repositórios
+- [ ] Revisar links, permissões e acessos antes da entrega
+- [ ] Enviar o PDF no Portal do Aluno dentro do prazo
+
+### Status da Fase 3
+
+- [ ] Autenticação e API Gateway: Pendente
+- [ ] Repositórios e CI/CD: Pendente
+- [ ] Infraestrutura Cloud: Pendente
+- [ ] Banco de Dados: Pendente
+- [ ] Kubernetes e Escalabilidade: Pendente
+- [ ] Monitoramento e Observabilidade: Pendente
+- [ ] Documentação da Arquitetura: Pendente
+- [ ] READMEs e documentação das APIs: Pendente
+- [ ] Vídeo de Demonstração: Pendente
+- [ ] PDF e entrega no Portal do Aluno: Pendente

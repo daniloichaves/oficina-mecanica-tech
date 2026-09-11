@@ -1,0 +1,93 @@
+# Função de autenticação por CPF executada localmente (kind/CI) via adapter HTTP.
+# Na AWS o mesmo código roda como Lambda (fase3-repositories/auth-lambda) e o
+# Traefik aponta o ForwardAuth para a Function URL.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-lambda
+  namespace: oficina
+  labels:
+    app: auth-lambda
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-lambda
+  template:
+    metadata:
+      labels:
+        app: auth-lambda
+    spec:
+      containers:
+        - name: auth-lambda
+          image: ghcr.io/daniloichaves/oficina-auth-lambda:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          env:
+            - name: PORT
+              value: "8081"
+            - name: DB_HOST
+              value: postgres
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: oficina_mecanica
+            - name: DB_SSL
+              value: "false"
+            - name: JWT_EXPIRATION_SECONDS
+              value: "3600"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: oficina-app-secret
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: oficina-app-secret
+                  key: DB_PASSWORD
+            # Mesmo segredo usado pela aplicação: o token emitido aqui é aceito pelo Spring Security.
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: oficina-app-secret
+                  key: JWT_SECRET
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities:
+              drop: [ALL]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-lambda
+  namespace: oficina
+spec:
+  selector:
+    app: auth-lambda
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081

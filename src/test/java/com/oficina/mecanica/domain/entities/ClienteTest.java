@@ -47,7 +47,7 @@ class ClienteTest {
 
     @Test
     void deveCriarClienteComAllArgsConstructor() {
-        Cliente cliente = new Cliente(1L, "52998224725", "João Silva", "11999999999", "joao@email.com", "Rua Teste, 123", null, null, new ArrayList<>());
+        Cliente cliente = new Cliente(1L, "52998224725", "João Silva", "11999999999", "joao@email.com", "Rua Teste, 123", StatusCliente.ATIVO, null, null, new ArrayList<>());
 
         assertEquals(1L, cliente.getId());
         assertEquals("52998224725", cliente.getCpfCnpj());

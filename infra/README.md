@@ -4,7 +4,7 @@
 
 | Recurso | Descrição |
 |---|---|
-| `kind_cluster.oficina` | Cluster Kubernetes local (kind), com port-mapping 30080 → NodePort do app |
+| `kind_cluster.oficina` | Cluster Kubernetes local (kind), com port-mapping 30080 → NodePort do Traefik |
 | `kubernetes_namespace.oficina` | Namespace `oficina` |
 | `kubernetes_secret.postgres` | Credenciais do banco |
 | `kubernetes_persistent_volume_claim.postgres` | Volume de dados (1Gi) |
@@ -24,7 +24,13 @@ terraform init
 terraform apply
 kubectl config use-context kind-oficina
 kubectl apply -f ../k8s/   # sobe o app (o banco já provisionado converge sem mudanças)
+kubectl -n oficina rollout status deployment/traefik
+curl http://localhost:30080/actuator/health
 ```
+
+O serviço da aplicação é interno (`ClusterIP`). Todo acesso HTTP externo passa pelo
+Traefik, exposto no NodePort `30080`; o dashboard administrativo permanece interno
+e não possui rota pública.
 
 O HPA precisa do metrics-server (não instalado por padrão no kind):
 

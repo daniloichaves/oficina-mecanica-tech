@@ -1,0 +1,25 @@
+# Rotas de negócio protegidas: o middleware lambda-auth@file (definido no Helm do Traefik em
+# oficina-mecanica-kubernetes-infra) valida o Bearer JWT na Lambda antes de encaminhar à aplicação.
+# Login por CPF acontece direto na Function URL da Lambda (POST { "cpf": "..." }).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: oficina-api-protected
+  namespace: oficina
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: lambda-auth@file
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: api.example.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: oficina-app
+                port:
+                  number: 8080

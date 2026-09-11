@@ -6,12 +6,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@ConditionalOnProperty(name = "app.legacy-auth.enabled", havingValue = "true")
 @Tag(name = "Autenticação", description = "Autenticação e geração de tokens")
 public class AuthController {
     
