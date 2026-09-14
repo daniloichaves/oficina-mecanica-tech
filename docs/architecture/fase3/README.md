@@ -1,5 +1,19 @@
 # Arquitetura — Fase 3
 
+## Demonstração da entrega
+
+**Vídeo demonstrativo da Fase 3 (AWS, Lambda, EKS, RDS, Datadog):**
+https://www.awesomescreenshot.com/video/56501252?key=47f588f269fe75963aa5f637b94e1072
+
+**Vimeo:** https://vimeo.com/1226680429?share=copy&fl=sv&fe=ci
+
+## Visão geral
+
+Esta fase amplia o MVP da oficina mecânica para um cenário corporativo com autenticação
+serverless, gateway de entrada com Traefik, orquestração em Kubernetes na AWS (EKS), banco
+managed em RDS PostgreSQL e observabilidade com Datadog. O objetivo é consolidar a solução
+em um ambiente de produção orientado a operação, observabilidade e segurança.
+
 - [Componentes](componentes.md)
 - [Sequências](sequencias.md)
 - [Autenticação por CPF e validação de JWT no gateway](autenticacao.md)

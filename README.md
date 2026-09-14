@@ -11,6 +11,15 @@ https://www.awesomescreenshot.com/video/54542994?key=99327f9bbfe766f7c14307bca56
 
 Vimeo: https://vimeo.com/1210011270?share=copy&fl=sv&fe=ci
 
+**Vídeo demonstrativo da Fase 3 (AWS, Lambda, EKS, RDS, Datadog):**
+https://www.awesomescreenshot.com/video/56501252?key=47f588f269fe75963aa5f637b94e1072
+
+Vimeo: https://vimeo.com/1226680429?share=copy&fl=sv&fe=ci
+
+
+
+
+
 ## Fase 2 — Objetivos
 
 Evolução da aplicação da Fase 1 para garantir **qualidade, resiliência e escalabilidade**:
@@ -43,6 +52,11 @@ flowchart LR
 **Fluxo de deploy:** push na branch → `build-and-test` (Maven + JaCoCo) → `docker` (build e push da imagem para `ghcr.io/daniloichaves/oficina-mecanica`) → `deploy` (cluster kind no runner, `kubectl apply -f k8s/`, rollout do banco e da aplicação, smoke test no `/actuator/health`).
 
 ## Fase 3 — Operação corporativa
+
+Status da entrega atual:
+- ✅ Concluído no repositório: arquitetura, documentos de decisão, diagramas, estrutura de repositórios e fluxo de autenticação por CPF/JWT;
+- ✅ Concluído no repositório: Terraform base para AWS/EKS/Traefik/Datadog, Lambda e RDS;
+- ⚠️ Pendência externa: provisionamento real na AWS, deploy operacional em homologação/produção, dashboards de monitoramento ao vivo, vídeo público e entrega final no portal do aluno.
 
 A evolução da Fase 3 adota AWS (EKS, Lambda e RDS PostgreSQL), Traefik e Datadog.
 A documentação arquitetural, decisões e diagramas estão centralizados em

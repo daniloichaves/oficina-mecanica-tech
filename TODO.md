@@ -365,14 +365,14 @@ Elevar a aplicação a um nível de operação corporativa, utilizando práticas
 
 ### README dos Repositórios
 
-- [ ] Documentar claramente o propósito de cada um dos 4 repositórios
-- [ ] Listar as tecnologias utilizadas em cada repositório
-- [ ] Documentar os passos de execução local
-- [ ] Documentar os passos de provisionamento e deploy
-- [ ] Adicionar o diagrama da arquitetura específica de cada repositório
+- [x] Documentar claramente o propósito de cada um dos 4 repositórios
+- [x] Listar as tecnologias utilizadas em cada repositório
+- [x] Documentar os passos de execução local
+- [x] Documentar os passos de provisionamento e deploy
+- [x] Adicionar o diagrama da arquitetura específica de cada repositório
 - [x] Adicionar link para Swagger e/ou collection Postman das APIs — disponível no README da aplicação
 - [x] Adicionar Dockerfile nos repositórios aplicáveis — concluído no repositório atual da aplicação
-- [ ] Documentar as pipelines de CI/CD e os ambientes
+- [x] Documentar as pipelines de CI/CD e os ambientes
 - [ ] Adicionar links para os deploys ativos, quando aplicável
 - [ ] Validar todas as instruções dos READMEs em ambiente limpo
 
@@ -400,13 +400,15 @@ Elevar a aplicação a um nível de operação corporativa, utilizando práticas
 
 ### Status da Fase 3
 
-- [ ] Autenticação e API Gateway: Pendente
-- [ ] Repositórios e CI/CD: Pendente
-- [ ] Infraestrutura Cloud: Pendente
-- [ ] Banco de Dados: Pendente
-- [ ] Kubernetes e Escalabilidade: Pendente
-- [ ] Monitoramento e Observabilidade: Pendente
-- [ ] Documentação da Arquitetura: Pendente
-- [ ] READMEs e documentação das APIs: Pendente
+> Status realista da entrega: a parte de arquitetura, documentação e estrutura do projeto está concluída no repositório. Os itens que ainda dependem de infraestrutura externa (AWS, deploy real, monitoramento ao vivo, vídeo público e entrega no portal) continuam pendentes.
+
+- [x] Autenticação e API Gateway: Concluído no repositório
+- [x] Repositórios e CI/CD: Concluído no repositório
+- [ ] Infraestrutura Cloud: Pendente (provisionamento real na AWS)
+- [x] Banco de Dados: Concluído no repositório / documentação
+- [x] Kubernetes e Escalabilidade: Concluído no repositório / manifests e HPA
+- [ ] Monitoramento e Observabilidade: Pendente (Datadog/alerta ao vivo)
+- [x] Documentação da Arquitetura: Concluído
+- [x] READMEs e documentação das APIs: Concluído
 - [ ] Vídeo de Demonstração: Pendente
 - [ ] PDF e entrega no Portal do Aluno: Pendente
