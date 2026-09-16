@@ -1,0 +1,8 @@
+com/oficina/billingservice/domain/entity/StatusOrcamento.class
+com/oficina/billingservice/domain/entity/Orcamento.class
+com/oficina/billingservice/application/dto/CriarOrcamentoRequest.class
+com/oficina/billingservice/BillingServiceApplication.class
+com/oficina/billingservice/application/service/OrcamentoService.class
+com/oficina/billingservice/infrastructure/persistence/OrcamentoRepository.class
+com/oficina/billingservice/domain/entity/Orcamento$OrcamentoBuilder.class
+com/oficina/billingservice/presentation/rest/OrcamentoController.class

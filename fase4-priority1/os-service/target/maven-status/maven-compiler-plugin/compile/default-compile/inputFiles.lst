@@ -1,0 +1,10 @@
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority1/os-service/src/main/java/com/oficina/osservice/application/service/OrdemServicoService.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority1/os-service/src/main/java/com/oficina/osservice/infrastructure/event/OsEventPublisher.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority1/os-service/src/main/java/com/oficina/osservice/application/dto/AtualizarStatusRequest.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority1/os-service/src/main/java/com/oficina/osservice/infrastructure/event/NoOpOsEventPublisher.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority1/os-service/src/main/java/com/oficina/osservice/application/dto/CriarOrdemServicoRequest.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority1/os-service/src/main/java/com/oficina/osservice/OsServiceApplication.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority1/os-service/src/main/java/com/oficina/osservice/domain/entity/StatusOrdemServico.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority1/os-service/src/main/java/com/oficina/osservice/presentation/rest/OrdemServicoController.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority1/os-service/src/main/java/com/oficina/osservice/domain/entity/OrdemServico.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority1/os-service/src/main/java/com/oficina/osservice/infrastructure/persistence/OrdemServicoRepository.java

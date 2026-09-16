@@ -1,0 +1,9 @@
+com/oficina/executionservice/application/service/ExecucaoService.class
+com/oficina/executionservice/domain/entity/Execucao$ExecucaoBuilder.class
+com/oficina/executionservice/infrastructure/persistence/ExecucaoRepository.class
+com/oficina/executionservice/application/dto/AtualizarStatusRequest.class
+com/oficina/executionservice/domain/entity/Execucao.class
+com/oficina/executionservice/domain/entity/StatusExecucao.class
+com/oficina/executionservice/ExecutionServiceApplication.class
+com/oficina/executionservice/application/dto/CriarExecucaoRequest.class
+com/oficina/executionservice/presentation/rest/ExecucaoController.class

@@ -1,0 +1,11 @@
+com/oficina/osservice/application/dto/CriarOrdemServicoRequest.class
+com/oficina/osservice/infrastructure/event/OsEventPublisher.class
+com/oficina/osservice/domain/entity/StatusOrdemServico.class
+com/oficina/osservice/application/dto/AtualizarStatusRequest.class
+com/oficina/osservice/application/service/OrdemServicoService.class
+com/oficina/osservice/domain/entity/OrdemServico$OrdemServicoBuilder.class
+com/oficina/osservice/presentation/rest/OrdemServicoController.class
+com/oficina/osservice/domain/entity/OrdemServico.class
+com/oficina/osservice/OsServiceApplication.class
+com/oficina/osservice/infrastructure/persistence/OrdemServicoRepository.class
+com/oficina/osservice/infrastructure/event/NoOpOsEventPublisher.class

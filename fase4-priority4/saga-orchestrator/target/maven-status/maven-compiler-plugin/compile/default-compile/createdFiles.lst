@@ -1,0 +1,7 @@
+com/oficina/saga/application/SagaEntity.class
+com/oficina/saga/presentation/SagaController.class
+com/oficina/saga/application/SagaRepository.class
+com/oficina/saga/SagaOrchestratorApplication.class
+com/oficina/saga/application/SagaStatus.class
+com/oficina/saga/infrastructure/InMemoryEventBus.class
+com/oficina/saga/application/SagaOrchestratorService.class
