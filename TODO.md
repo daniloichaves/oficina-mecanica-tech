@@ -412,3 +412,107 @@ Elevar a aplicação a um nível de operação corporativa, utilizando práticas
 - [x] READMEs e documentação das APIs: Concluído
 - [ ] Vídeo de Demonstração: Pendente
 - [ ] PDF e entrega no Portal do Aluno: Pendente
+
+---
+
+## FASE 4 - Tech Challenge
+
+**Peso:** 90% da nota de todas as disciplinas da fase
+
+### Objetivo
+
+Refatorar a aplicação para arquitetura de microsserviços com gestão transacional distribuída, consistência entre transações críticas e automação completa de build, testes e deploy.
+
+### Progresso real implementado até o momento
+
+- [x] Prioridade 1: protótipo funcional do serviço de OS em `fase4-priority1/os-service`
+- [x] Prioridade 2: protótipo funcional do serviço de orçamento em `fase4-priority2/billing-service`
+- [x] Prioridade 3: protótipo funcional do serviço de execução/produção em `fase4-priority3/execution-service`
+- [x] Mensageria e eventos entre microsserviços: protótipo de orquestração em `fase4-priority4/saga-orchestrator`
+- [x] Saga Pattern e compensação: fluxo mínimo validado com transição de estados e compensação em eventos de rejeição
+- [ ] Deploy automatizado em Kubernetes
+- [ ] Arquitetura completa de 3+ microsserviços e repositórios independentes
+
+### Microsserviços e separação de responsabilidades
+
+- [x] Definir responsável do serviço de Ordem de Serviço (abertura, atualização e consulta de status/histórico) — protótipo concluído
+- [x] Definir responsável do serviço de Orçamento e Pagamento (geração de orçamento, registro e verificação de pagamentos) — protótipo concluído
+- [x] Definir responsável do serviço de Execução e Produção (fila de execução, diagnóstico, reparos e finalização) — protótipo concluído
+- [ ] Dividir a solução em pelo menos 3 microsserviços independentes
+- [ ] Criar um repositório próprio para cada microsserviço
+- [ ] Garantir banco de dados próprio para cada microsserviço
+- [ ] Usar pelo menos um banco relacional (SQL)
+- [ ] Usar pelo menos um banco não relacional (NoSQL)
+- [ ] Documentar a arquitetura e as fronteiras de cada microsserviço
+
+### Comunicação entre microsserviços
+
+- [x] Definir comunicação síncrona via APIs RESTful quando necessário — base inicial validada entre OS e Billing em protótipos locais
+- [x] Definir comunicação assíncrona via mensageria (protótipo de event bus e saga em `fase4-priority4/saga-orchestrator`)
+- [ ] Garantir que nenhum serviço acesse diretamente o banco de outro serviço
+- [ ] Documentar os eventos e integrações entre serviços
+
+### Saga Pattern
+
+- [x] Implementar o Saga Pattern para coordenar as transações distribuídas da ordem de serviço — protótipo validado com transições entre orçamento e execução
+- [x] Definir fluxo de abertura da OS → geração do orçamento → aprovação → execução
+- [x] Implementar rollback e compensação em caso de falha em qualquer etapa — modelo de compensação com evento de rejeição
+- [ ] Escolher e documentar abordagem orquestrada ou coreografada
+- [ ] Registrar a justificativa da escolha no README e na arquitetura
+
+### Testes e qualidade
+
+- [x] Criar testes unitários no protótipo do serviço de OS
+- [x] Criar testes unitários no protótipo do serviço de orçamento
+- [ ] Criar testes unitários em todos os microsserviços
+- [ ] Criar pelo menos um fluxo completo testado com BDD
+- [ ] Garantir cobertura mínima de 80% por serviço
+- [ ] Integrar SonarQube ou ferramenta equivalente ao CI
+- [ ] Validar a qualidade do código em todos os repositórios
+
+### CI/CD Automatizado
+
+- [ ] Criar pipeline independente de CI/CD para cada microsserviço
+- [ ] Incluir build, testes automatizados, qualidade do código e deploy
+- [ ] Proteger a branch `main` com pull request obrigatório
+- [ ] Configurar checagens automáticas antes do merge
+- [ ] Automatizar deploy em ambiente Kubernetes
+
+### Infraestrutura
+
+- [ ] Cada microsserviço deve ter seu próprio repositório
+- [ ] Configurar deploy automatizado para ambiente Kubernetes
+- [ ] Incluir mensageria para orquestração ou coreografia
+- [ ] Validar observabilidade e monitoramento dos microsserviços
+- [ ] Garantir que a infraestrutura seja reproduzível e versionada
+
+### Entregáveis da Fase 4
+
+- [ ] Criar repositórios Git para cada microsserviço com código, Dockerfile e manifests Kubernetes
+- [ ] Incluir pipelines de CI/CD em cada repositório
+- [ ] Incluir evidências de cobertura de testes no README
+- [ ] Atualizar documentação da arquitetura do serviço
+- [ ] Atualizar Swagger ou collection Postman
+- [ ] Upload do vídeo de demonstração no YouTube ou Vimeo (até 15 minutos)
+- [ ] Demonstrar o fluxo completo de uma OS atraves dos microsserviços
+- [ ] Demonstrar execução do Saga Pattern e tratamento de falhas
+- [ ] Demonstrar deploy automatizado de pelo menos um microsserviço com validação de testes
+- [ ] Demonstrar monitoramento e rastreamento dos fluxos distribuídos
+- [ ] Criar PDF com nome e identificação dos participantes
+- [ ] Incluir links dos repositórios, vídeo e diagrama geral da arquitetura
+- [ ] Descrever a estratégia escolhida para o Saga Pattern
+- [ ] Justificar a divisão dos microsserviços e tecnologias utilizadas
+- [ ] Enviar o PDF no portal do aluno dentro do prazo
+
+### Status da Fase 4
+
+> Status realista da entrega: a Fase 4 foi iniciada com protótipos funcionais de três microsserviços essenciais (OS Service, Billing Service e Execution Service). A arquitetura distribuída completa, a saga, a mensageria e o deploy automatizado continuam pendentes e serão implementados em etapas subsequentes.
+
+- [x] Separação inicial em microsserviços: concluída em protótipo
+- [x] Comunicação síncrona inicial: validada em nível de API local
+- [x] Comunicação assíncrona e mensageria: protótipo validado com event bus
+- [x] Saga Pattern e compensação: protótipo validado com fluxo e compensação
+- [ ] Testes e qualidade por serviço: parcialmente validado, incompleto
+- [ ] CI/CD e deploy automatizado: pendente
+- [ ] Infraestrutura e mensageria: pendente
+- [ ] Vídeo e documentação final: pendente

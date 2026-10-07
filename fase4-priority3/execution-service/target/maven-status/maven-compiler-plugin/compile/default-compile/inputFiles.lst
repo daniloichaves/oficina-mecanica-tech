@@ -1,0 +1,8 @@
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority3/execution-service/src/main/java/com/oficina/executionservice/application/dto/AtualizarStatusRequest.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority3/execution-service/src/main/java/com/oficina/executionservice/presentation/rest/ExecucaoController.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority3/execution-service/src/main/java/com/oficina/executionservice/ExecutionServiceApplication.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority3/execution-service/src/main/java/com/oficina/executionservice/application/dto/CriarExecucaoRequest.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority3/execution-service/src/main/java/com/oficina/executionservice/infrastructure/persistence/ExecucaoRepository.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority3/execution-service/src/main/java/com/oficina/executionservice/domain/entity/Execucao.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority3/execution-service/src/main/java/com/oficina/executionservice/domain/entity/StatusExecucao.java
+/home/bragantini/Documentos/Fiap/oficina-mecanica-tech/fase4-priority3/execution-service/src/main/java/com/oficina/executionservice/application/service/ExecucaoService.java

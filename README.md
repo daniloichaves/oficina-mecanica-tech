@@ -85,6 +85,28 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:30080/api/clientes
 O login legado inseguro (`POST /api/auth/login`) está desativado por padrão e pode ser
 habilitado somente para compatibilidade local com `LEGACY_AUTH_ENABLED=true`.
 
+## Fase 4 — Progresso inicial em microsserviços
+
+A Fase 4 foi iniciada com uma estratégia incremental e realista: primeiro validamos o
+serviço de OS e depois o serviço de orçamento em protótipos independentes, antes de
+avançar para a composição distribuída completa.
+
+### Estado atual da implementação
+- ✅ Prioridade 1: `fase4-priority1/os-service` — protótipo funcional com criação, consulta e atualização de status da ordem de serviço.
+- ✅ Prioridade 2: `fase4-priority2/billing-service` — protótipo funcional para criação, aprovação, rejeição e pagamento de orçamentos.
+- ✅ Prioridade 3: `fase4-priority3/execution-service` — protótipo funcional para criação, início, finalização e entrega da execução da ordem.
+- ✅ Prioridade 4: `fase4-priority4/saga-orchestrator` — protótipo funcional de mensageria e saga com transição de estados e compensação.
+- ⚠️ Ainda pendente: deploy automatizado e arquitetura completa de 3+ microsserviços com repositórios independentes, além do fechamento final com CI/CD e observabilidade distribuída.
+
+### Evidência validada localmente
+- `mvn test -q` em `fase4-priority1/os-service` executou com sucesso.
+- `mvn test -q && echo 'BILLING_SERVICE_TESTS_OK'` em `fase4-priority2/billing-service` executou com sucesso;
+  o terminal retornou `BILLING_SERVICE_TESTS_OK`.
+- `mvn test -q && echo 'EXECUTION_SERVICE_TESTS_OK'` em `fase4-priority3/execution-service` executou com sucesso;
+  o terminal retornou `EXECUTION_SERVICE_TESTS_OK`.
+- `mvn test -q && echo 'SAGA_ORCHESTRATOR_TESTS_OK'` em `fase4-priority4/saga-orchestrator` executou com sucesso;
+  o terminal retornou `SAGA_ORCHESTRATOR_TESTS_OK`.
+
 ### Decisões de arquitetura (Fase 2)
 
 - **Hexagonal pragmática:** os ports de repositório/notificação vivem em `domain/repositories`; os adapters (Spring Data JPA, SMTP) na infraestrutura. As entidades de domínio mantêm anotações JPA — tradeoff consciente de MVP para não duplicar o modelo; documentado nos próprios ports.
