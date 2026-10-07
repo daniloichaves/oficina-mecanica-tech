@@ -107,11 +107,116 @@ avançar para a composição distribuída completa.
 - `mvn test -q && echo 'SAGA_ORCHESTRATOR_TESTS_OK'` em `fase4-priority4/saga-orchestrator` executou com sucesso;
   o terminal retornou `SAGA_ORCHESTRATOR_TESTS_OK`.
 
+### Documentação executiva do Fase 4
+
+Resumo executivo e roteiro de apresentação:
+- [`docs/fase4/README.md`](docs/fase4/README.md)
+
+### Execução local do MVP Fase 4
+
+Para subir todos os protótipos do Fase 4 em modo local, use os scripts da raiz do projeto:
+
+```bash
+chmod +x run-fase4-local.sh stop-fase4-local.sh
+./run-fase4-local.sh
+```
+
+Isso inicia os serviços nas portas:
+- 8081 — OS Service
+- 8082 — Billing Service
+- 8083 — Execution Service
+- 8084 — Saga Orchestrator
+
+Validação de fluxo executada em runtime:
+
+```bash
+curl -i -X POST http://localhost:8081/api/os \
+  -H 'Content-Type: application/json' \
+  -d '{"placaVeiculo":"ABC1234","clienteId":"cli-1","nomeCliente":"Joao","descricaoDefeito":"Freio travado"}'
+
+curl -i -X POST http://localhost:8082/api/orcamentos \
+  -H 'Content-Type: application/json' \
+  -d '{"ordemId":1,"clienteId":"cli-1","valor":1500.00}'
+
+curl -i -X POST http://localhost:8083/api/execucoes \
+  -H 'Content-Type: application/json' \
+  -d '{"ordemId":1,"clienteId":"cli-1","descricaoTarefa":"Troca de pastilhas"}'
+
+curl -i -X POST http://localhost:8084/api/sagas/ordens/1/iniciar
+```
+
+> Com esse setup, o fluxo do protótipo Fase 4 foi validado em runtime sem falha de startup ao iniciar o módulo correto.
 ### Decisões de arquitetura (Fase 2)
 
 - **Hexagonal pragmática:** os ports de repositório/notificação vivem em `domain/repositories`; os adapters (Spring Data JPA, SMTP) na infraestrutura. As entidades de domínio mantêm anotações JPA — tradeoff consciente de MVP para não duplicar o modelo; documentado nos próprios ports.
 - **Recusa de orçamento → status `CANCELADA`:** o enunciado prevê aprovação/recusa via notificação externa; a recusa encerra a OS com `CANCELADA` (fora da fila de trabalho, mantida no banco).
 - **Exclusão lógica na listagem:** `GET /api/ordens-servico` omite `FINALIZADA`/`ENTREGUE`/`CANCELADA` (nada é apagado; tudo permanece acessível por id e em `/paginado`).
+
+## Arquitetura da Fase 4 — microsserviços e Saga
+
+A Fase 4 foi estruturada como um conjunto de protótipos de microsserviços, cada um com responsabilidade específica e integração por API REST e eventos assíncronos. O objetivo foi validar a divisão funcional da solução sem perder a trilha de evolução do domínio do negócio.
+
+### Serviços envolvidos
+
+- **OS Service** (`fase4-priority1/os-service`)
+  - responsável por abrir, consultar e atualizar a ordem de serviço;
+  - mantém o estado principal da OS;
+  - expõe endpoints para criação e atualização de status.
+
+- **Billing Service** (`fase4-priority2/billing-service`)
+  - responsável por criar o orçamento, aprovar, rejeitar e registrar pagamento;
+  - centraliza a regra financeira do fluxo;
+  - valida a transição de orçamento para execução.
+
+- **Execution Service** (`fase4-priority3/execution-service`)
+  - responsável pela etapa operacional da ordem;
+  - acompanha início, andamento, finalização e entrega do serviço realizado.
+
+- **Saga Orchestrator** (`fase4-priority4/saga-orchestrator`)
+  - atua como coordenador do fluxo distribuído;
+  - recebe eventos e transita o estado da ordem conforme a saga avança;
+  - implementa a compensação em cenários de rejeição ou falha.
+
+### Estratégia de integração
+
+A abordagem escolhida para o protótipo foi a **orquestração centralizada**. O orchestrator mantém a visão do fluxo principal e coordena as transições de estado entre os serviços, enquanto a integração síncrona é feita por APIs REST para fluxos que exigem resposta imediata.
+
+Os eventos assíncronos são usados para representar mudanças importantes do processo, como:
+
+- `OS_CRIADA`
+- `ORCAMENTO_EM_ANDAMENTO`
+- `ORCAMENTO_APROVADO`
+- `ORCAMENTO_REJEITADO`
+- `EXECUCAO_INICIADA`
+- `EXECUCAO_FINALIZADA`
+- `COMPENSACAO_EXECUTADA`
+
+### Fluxo do Saga
+
+1. O cliente cria uma OS no serviço de ordem de serviço.
+2. O orchestrator dispara a etapa de orçamento.
+3. O Billing Service avalia o orçamento e aprova ou rejeita.
+4. Se aprovado, a execução é iniciada.
+5. O Execution Service finaliza a atividade operacional.
+6. Se qualquer etapa falhar ou o orçamento for rejeitado, a saga aplica compensação e marca a ordem com o estado correspondente.
+
+### Padrões adotados no MVP
+
+- **API REST para comunicação síncrona** entre serviços quando há necessidade de resposta imediata;
+- **eventos para coordenação assíncrona** e rastreabilidade do processo;
+- **separação por contexto de negócio** para reduzir acoplamento entre as regras de OS, orçamento e execução;
+- **compensação explícita** em cenários de rejeição para manter o estado consistente do processo;
+- **protótipo local** em um único repositório, com a arquitetura preparada para evolução para repositórios independentes.
+
+### Observações de maturidade
+
+Este é um MVP de arquitetura distribuída. A solução já valida a divisão funcional e o fluxo de saga, mas ainda não atende ao nível de produção completo esperado para o desafio final, especialmente em relação a:
+
+- repositórios independentes por microsserviço;
+- banco dedicado por serviço;
+- deploy automatizado em Kubernetes;
+- observabilidade e monitoramento distribuído;
+- infraestrutura reproduzível e versionada.
 
 ## Stack Tecnológica
 
