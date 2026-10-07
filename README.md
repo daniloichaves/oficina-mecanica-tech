@@ -146,7 +146,6 @@ curl -i -X POST http://localhost:8084/api/sagas/ordens/1/iniciar
 ```
 
 > Com esse setup, o fluxo do protótipo Fase 4 foi validado em runtime sem falha de startup ao iniciar o módulo correto.
-
 ### Decisões de arquitetura (Fase 2)
 
 - **Hexagonal pragmática:** os ports de repositório/notificação vivem em `domain/repositories`; os adapters (Spring Data JPA, SMTP) na infraestrutura. As entidades de domínio mantêm anotações JPA — tradeoff consciente de MVP para não duplicar o modelo; documentado nos próprios ports.
