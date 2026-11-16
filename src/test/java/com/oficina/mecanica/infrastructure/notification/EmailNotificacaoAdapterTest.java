@@ -3,6 +3,8 @@ package com.oficina.mecanica.infrastructure.notification;
 import com.oficina.mecanica.domain.entities.Cliente;
 import com.oficina.mecanica.domain.entities.OrdemServico;
 import com.oficina.mecanica.domain.entities.StatusOrdemServico;
+import com.oficina.mecanica.infrastructure.observability.OficinaMetrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -12,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,9 +52,14 @@ class EmailNotificacaoAdapterTest {
     }
 
     @Test
-    void naoDevePropagarFalhaDeSmtp() {
+    void naoDevePropagarFalhaDeSmtpERegistrarMetrica() {
         doThrow(new MailSendException("smtp fora")).when(mailSender).send(any(SimpleMailMessage.class));
+        assertDoesNotThrow(() -> adapter.notificarMudancaStatus(os()));
+
+        SimpleMeterRegistry registry = new SimpleMeterRegistry();
+        ReflectionTestUtils.setField(adapter, "oficinaMetrics", new OficinaMetrics(registry));
 
         assertDoesNotThrow(() -> adapter.notificarMudancaStatus(os()));
+        assertEquals(1.0, registry.get("oficina.integracao.notificacao.erros").counter().count());
     }
 }
