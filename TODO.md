@@ -197,7 +197,7 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 ### Repositório
 - [x] Configurar repositório privado
 - [x] Dar acesso ao usuário soat-architecture
-- [ ] Verificar commit de todo código-fonte
+- [x] Verificar commit de todo código-fonte
 - [x] Verificar presença de Dockerfile e docker-compose.yml
 - [x] Verificar README.md completo
 
@@ -207,6 +207,15 @@ Desenvolver MVP de back-end para sistema integrado de atendimento e execução d
 - [x] Testar execução local via README (aplicação iniciou com sucesso)
 - [x] Testar build com Docker (Maven build validado)
 - [x] Validar cobertura de testes
+
+### Fase 4 — Microsserviços e Saga
+- [x] Validar OS Service em runtime na porta 8081
+- [x] Validar Billing Service em runtime na porta 8082
+- [x] Validar Execution Service em runtime na porta 8083
+- [x] Validar Saga Orchestrator em runtime na porta 8084
+- [x] Validar fluxo end-to-end de criação, orçamento, execução e saga
+- [x] Preparar scripts de execução local (`run-fase4-local.sh` e `stop-fase4-local.sh`)
+- [x] Registrar evidências no README e no histórico de execução
 
 ---
 
@@ -430,15 +439,18 @@ Refatorar a aplicação para arquitetura de microsserviços com gestão transaci
 - [x] Prioridade 3: protótipo funcional do serviço de execução/produção em `fase4-priority3/execution-service`
 - [x] Mensageria e eventos entre microsserviços: protótipo de orquestração em `fase4-priority4/saga-orchestrator`
 - [x] Saga Pattern e compensação: fluxo mínimo validado com transição de estados e compensação em eventos de rejeição
+- [x] Base de testes validada localmente nos protótipos principais
 - [ ] Deploy automatizado em Kubernetes
 - [ ] Arquitetura completa de 3+ microsserviços e repositórios independentes
+- [ ] Entrega formal de documentação, vídeo, PDF e desenho de arquitetura final
 
 ### Microsserviços e separação de responsabilidades
 
 - [x] Definir responsável do serviço de Ordem de Serviço (abertura, atualização e consulta de status/histórico) — protótipo concluído
 - [x] Definir responsável do serviço de Orçamento e Pagamento (geração de orçamento, registro e verificação de pagamentos) — protótipo concluído
 - [x] Definir responsável do serviço de Execução e Produção (fila de execução, diagnóstico, reparos e finalização) — protótipo concluído
-- [ ] Dividir a solução em pelo menos 3 microsserviços independentes
+- [x] Validar fluxo inicial de responsabilidade entre os três serviços em ambiente local
+- [ ] Dividir a solução em pelo menos 3 microsserviços independentes em repositórios separados
 - [ ] Criar um repositório próprio para cada microsserviço
 - [ ] Garantir banco de dados próprio para cada microsserviço
 - [ ] Usar pelo menos um banco relacional (SQL)
@@ -451,6 +463,7 @@ Refatorar a aplicação para arquitetura de microsserviços com gestão transaci
 - [x] Definir comunicação assíncrona via mensageria (protótipo de event bus e saga em `fase4-priority4/saga-orchestrator`)
 - [ ] Garantir que nenhum serviço acesse diretamente o banco de outro serviço
 - [ ] Documentar os eventos e integrações entre serviços
+- [ ] Validar um fluxo completo de ponta a ponta com aprovação, execução e compensação
 
 ### Saga Pattern
 
@@ -459,13 +472,15 @@ Refatorar a aplicação para arquitetura de microsserviços com gestão transaci
 - [x] Implementar rollback e compensação em caso de falha em qualquer etapa — modelo de compensação com evento de rejeição
 - [ ] Escolher e documentar abordagem orquestrada ou coreografada
 - [ ] Registrar a justificativa da escolha no README e na arquitetura
+- [ ] Validar o comportamento em cenário de falha real com evidência de compensação
 
 ### Testes e qualidade
 
 - [x] Criar testes unitários no protótipo do serviço de OS
 - [x] Criar testes unitários no protótipo do serviço de orçamento
-- [ ] Criar testes unitários em todos os microsserviços
-- [ ] Criar pelo menos um fluxo completo testado com BDD
+- [x] Criar testes unitários no protótipo do serviço de execução
+- [x] Criar testes unitários no protótipo do orchestrator de saga
+- [ ] Criar pelo menos um fluxo completo testado com BDD ou integração
 - [ ] Garantir cobertura mínima de 80% por serviço
 - [ ] Integrar SonarQube ou ferramenta equivalente ao CI
 - [ ] Validar a qualidade do código em todos os repositórios
@@ -506,13 +521,21 @@ Refatorar a aplicação para arquitetura de microsserviços com gestão transaci
 
 ### Status da Fase 4
 
-> Status realista da entrega: a Fase 4 foi iniciada com protótipos funcionais de três microsserviços essenciais (OS Service, Billing Service e Execution Service). A arquitetura distribuída completa, a saga, a mensageria e o deploy automatizado continuam pendentes e serão implementados em etapas subsequentes.
+> Status realista da entrega: a Fase 4 já possui protótipos funcionais de três microsserviços essenciais (OS Service, Billing Service e Execution Service) e um orchestrator de saga validado localmente. O que resta para a entrega final é consolidar a documentação, validar o fluxo completo, automatizar o deploy e fechar os entregáveis exigidos pela disciplina.
 
 - [x] Separação inicial em microsserviços: concluída em protótipo
 - [x] Comunicação síncrona inicial: validada em nível de API local
 - [x] Comunicação assíncrona e mensageria: protótipo validado com event bus
 - [x] Saga Pattern e compensação: protótipo validado com fluxo e compensação
+- [x] Base de testes por serviço: validada localmente no protótipo
 - [ ] Testes e qualidade por serviço: parcialmente validado, incompleto
 - [ ] CI/CD e deploy automatizado: pendente
 - [ ] Infraestrutura e mensageria: pendente
-- [ ] Vídeo e documentação final: pendente
+- [ ] Vídeo, PDF e documentação final: pendente
+
+### Próximos passos recomendados
+
+1. Consolidar a documentação da arquitetura e do fluxo do Saga
+2. Rodar e registrar um fluxo completo de OS com aprovação e execução
+3. Validar deploy local mínimo em Kubernetes/Docker
+4. Preparar o material final (README, links, vídeo e PDF)
