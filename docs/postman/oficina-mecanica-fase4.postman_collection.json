@@ -1,0 +1,76 @@
+{
+  "info": {
+    "name": "Oficina Mecânica - Fase 4 Microsserviços & Saga",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection dos 4 microsserviços da Fase 4: OS Service (8081), Billing Service + Mercado Pago (8082), Execution Service MongoDB (8083) e Saga Orchestrator (8084)."
+  },
+  "item": [
+    {
+      "name": "1. OS Service - Abrir OS",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"placaVeiculo\":\"ABC1234\",\"clienteId\":\"cli-1\",\"nomeCliente\":\"João Silva\",\"descricaoDefeito\":\"Freio travado\"}"
+        },
+        "url": "http://localhost:8081/api/os"
+      }
+    },
+    {
+      "name": "2. OS Service - Listar OS",
+      "request": {"method": "GET", "url": "http://localhost:8081/api/os"}
+    },
+    {
+      "name": "3. Saga - Iniciar Orquestração OS #1",
+      "request": {"method": "POST", "url": "http://localhost:8084/api/sagas/ordens/1/iniciar"}
+    },
+    {
+      "name": "4. Billing Service - Criar Orçamento",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\"ordemId\":1,\"clienteId\":\"cli-1\",\"valor\":1500.00}"},
+        "url": "http://localhost:8082/api/orcamentos"
+      }
+    },
+    {
+      "name": "5. Billing Service - Aprovar Orçamento",
+      "request": {"method": "PATCH", "url": "http://localhost:8082/api/orcamentos/1/aprovar"}
+    },
+    {
+      "name": "6. Billing Service - Pagar via Mercado Pago",
+      "request": {"method": "PATCH", "url": "http://localhost:8082/api/orcamentos/1/pagar"}
+    },
+    {
+      "name": "7. Billing Service - Webhook Mercado Pago",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\"orcamentoId\":1,\"paymentId\":\"mp-12345\",\"status\":\"approved\"}"},
+        "url": "http://localhost:8082/api/orcamentos/webhook/mercadopago"
+      }
+    },
+    {
+      "name": "8. Saga - Avançar Orçamento Aprovado",
+      "request": {"method": "POST", "url": "http://localhost:8084/api/sagas/ordens/1/eventos?evento=ORCAMENTO_APROVADO"}
+    },
+    {
+      "name": "9. Execution Service (MongoDB) - Criar Execução",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {"mode": "raw", "raw": "{\"ordemId\":1,\"clienteId\":\"cli-1\",\"descricaoTarefa\":\"Troca de pastilhas\"}"},
+        "url": "http://localhost:8083/api/execucoes"
+      }
+    },
+    {
+      "name": "10. Saga - Consultar Estado da Saga",
+      "request": {"method": "GET", "url": "http://localhost:8084/api/sagas/ordens/1"}
+    },
+    {
+      "name": "11. Saga - Simular Compensação por Rejeição",
+      "request": {"method": "POST", "url": "http://localhost:8084/api/sagas/ordens/1/eventos?evento=ORCAMENTO_REJEITADO"}
+    }
+  ]
+}

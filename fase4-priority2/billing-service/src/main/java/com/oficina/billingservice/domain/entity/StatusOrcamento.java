@@ -4,5 +4,6 @@ public enum StatusOrcamento {
     PENDENTE,
     APROVADO,
     REJEITADO,
-    PAGO
+    PAGO,
+    ESTORNADO
 }

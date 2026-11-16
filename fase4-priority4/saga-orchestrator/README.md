@@ -1,33 +1,47 @@
-# Saga Orchestrator
+# Saga Orchestrator (`saga-orchestrator`)
 
-Protótipo de mensageria e saga para a Fase 4.
+Orquestrador central do **Saga Pattern** para coordenar transações distribuídas entre `os-service`, `billing-service` e `execution-service`, garantindo rollback e compensação em falhas ou rejeições.
 
-## Objetivo
+## Escolha da Estratégia (Orquestrada vs. Coreografada)
 
-Validar o fluxo de eventos de uma ordem de serviço em da ordem:
+Adotamos a abordagem **Orquestrada** porque o fluxo de oficina envolve compensações coordenadas entre múltiplos domínios (estorno no Mercado Pago + cancelamento da OS), exigindo rastreabilidade centralizada em banco próprio (`sagadb`) e ausência de acoplamento direto entre os serviços de negócio.
 
-1. ordem criada
-2. orçamento em andamento
-3. orçamento aprovado
-4. execução em andamento
-5. execução finalizada
-6. compensação em caso de rejeição
+## Tecnologias
 
-## Endpoints principais
+- Java 21 + Spring Boot 3.2.5
+- Spring Data JPA + PostgreSQL (SQL) / H2 (testes locais)
+- RabbitMQ (`spring-boot-starter-amqp`) + `RestClient` com propagação `X-Correlation-ID`
+- **Cucumber BDD** (cenários Gherkin para fluxo completo e compensações) + JUnit 5 + JaCoCo (>= 80%)
+- SpringDoc OpenAPI (Swagger) + Actuator + Prometheus + Logstash JSON
 
-- POST /api/sagas/ordens/{ordemId}/iniciar
-- POST /api/sagas/ordens/{ordemId}/eventos?evento=ORCAMENTO_APROVADO
-- POST /api/sagas/ordens/{ordemId}/eventos?evento=ORCAMENTO_REJEITADO
+## Arquitetura do Serviço
 
-## Execução local
-
-```bash
-cd fase4-priority4/saga-orchestrator
-mvn spring-boot:run
+```mermaid
+flowchart LR
+    MQ((RabbitMQ)) -->|Eventos os/orcamento/execucao| LST[SagaRabbitListener]
+    API[SagaController :8084] --> SVC[SagaOrchestratorService]
+    LST --> SVC
+    SVC --> DB[(PostgreSQL - sagadb)]
+    SVC -->|REST + Compensação| OS[OS Service]
+    SVC -->|REST + Estorno| BILL[Billing Service]
+    SVC -->|REST| EXEC[Execution Service]
 ```
 
-## Validação
+## Endpoints e Documentação
+
+- Swagger UI: `http://localhost:8084/swagger-ui.html`
+- Collection Postman: [`docs/postman/oficina-mecanica-fase4.postman_collection.json`](../../docs/postman/oficina-mecanica-fase4.postman_collection.json)
+- `POST /api/sagas/ordens/{ordemId}/iniciar`
+- `POST /api/sagas/ordens/{ordemId}/eventos?evento=...`
+- `GET /api/sagas/ordens/{ordemId}` | `GET /api/sagas`
+
+## Execução, Testes BDD e Deploy
 
 ```bash
-mvn test -q && echo 'SAGA_ORCHESTRATOR_TESTS_OK'
+# Testes unitários + suíte BDD Cucumber + cobertura JaCoCo >= 80%
+mvn -B clean verify
+
+# Docker & Kubernetes
+docker build -t oficina-saga-orchestrator .
+kubectl apply -f k8s/
 ```

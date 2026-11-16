@@ -1,6 +1,7 @@
-/target/
-/out/
-/build/
+target/
+out/
+build/
+logs/
 
 # Maven wrapper logs and temp files
 /.mvn/wrapper/maven-wrapper.jar.backup

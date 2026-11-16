@@ -3,7 +3,9 @@ package com.oficina.mecanica.application.services;
 import com.oficina.mecanica.application.dto.*;
 import com.oficina.mecanica.domain.entities.*;
 import com.oficina.mecanica.domain.repositories.*;
+import com.oficina.mecanica.infrastructure.observability.OficinaMetrics;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,21 @@ public class OrdemServicoService {
     private final ServicoRepository servicoRepository;
     private final PecaRepository pecaRepository;
     private final NotificacaoPort notificacaoPort;
+
+    @Autowired(required = false)
+    private OficinaMetrics oficinaMetrics;
+
+    private void registrarTransicao(OrdemServico os) {
+        if (oficinaMetrics != null) {
+            oficinaMetrics.registrarTransicaoStatus(os.getStatus());
+        }
+    }
+
+    private void registrarErro(String operacao) {
+        if (oficinaMetrics != null) {
+            oficinaMetrics.registrarErroProcessamentoOs(operacao);
+        }
+    }
     
     public OrdemServicoDTO criar(CriarOrdemServicoDTO dto) {
         Cliente cliente = clienteRepository.findById(dto.getClienteId())
@@ -72,59 +89,87 @@ public class OrdemServicoService {
         }
         
         os = ordemServicoRepository.save(os);
+        if (oficinaMetrics != null) {
+            oficinaMetrics.registrarOrdemCriada();
+            oficinaMetrics.registrarTransicaoStatus(os.getStatus());
+        }
         return toDTO(os);
     }
     
     public OrdemServicoDTO iniciarDiagnostico(Long id) {
         OrdemServico os = ordemServicoRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
+            .orElseThrow(() -> {
+                registrarErro("iniciarDiagnostico");
+                return new IllegalArgumentException("Ordem de Serviço não encontrada");
+            });
         os.iniciarDiagnostico();
         os = ordemServicoRepository.save(os);
+        registrarTransicao(os);
         notificacaoPort.notificarMudancaStatus(os);
         return toDTO(os);
     }
     
     public OrdemServicoDTO concluirDiagnostico(Long id) {
         OrdemServico os = ordemServicoRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
+            .orElseThrow(() -> {
+                registrarErro("concluirDiagnostico");
+                return new IllegalArgumentException("Ordem de Serviço não encontrada");
+            });
         os.concluirDiagnostico();
         os = ordemServicoRepository.save(os);
+        registrarTransicao(os);
         notificacaoPort.notificarMudancaStatus(os);
         return toDTO(os);
     }
     
     public OrdemServicoDTO aprovarOrcamento(Long id) {
         OrdemServico os = ordemServicoRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
+            .orElseThrow(() -> {
+                registrarErro("aprovarOrcamento");
+                return new IllegalArgumentException("Ordem de Serviço não encontrada");
+            });
         os.aprovarOrcamento();
         os = ordemServicoRepository.save(os);
+        registrarTransicao(os);
         notificacaoPort.notificarMudancaStatus(os);
         return toDTO(os);
     }
     
     public OrdemServicoDTO recusarOrcamento(Long id) {
         OrdemServico os = ordemServicoRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
+            .orElseThrow(() -> {
+                registrarErro("recusarOrcamento");
+                return new IllegalArgumentException("Ordem de Serviço não encontrada");
+            });
         os.recusarOrcamento();
         os = ordemServicoRepository.save(os);
+        registrarTransicao(os);
         notificacaoPort.notificarMudancaStatus(os);
         return toDTO(os);
     }
 
     public OrdemServicoDTO finalizar(Long id) {
         OrdemServico os = ordemServicoRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
+            .orElseThrow(() -> {
+                registrarErro("finalizar");
+                return new IllegalArgumentException("Ordem de Serviço não encontrada");
+            });
         os.finalizar();
         os = ordemServicoRepository.save(os);
+        registrarTransicao(os);
         notificacaoPort.notificarMudancaStatus(os);
         return toDTO(os);
     }
     
     public OrdemServicoDTO entregar(Long id) {
         OrdemServico os = ordemServicoRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Ordem de Serviço não encontrada"));
+            .orElseThrow(() -> {
+                registrarErro("entregar");
+                return new IllegalArgumentException("Ordem de Serviço não encontrada");
+            });
         os.entregar();
         os = ordemServicoRepository.save(os);
+        registrarTransicao(os);
         notificacaoPort.notificarMudancaStatus(os);
         return toDTO(os);
     }

@@ -1,0 +1,126 @@
+{
+  "title": "Oficina Mecânica - Observabilidade Corporativa (Fase 3 & 4)",
+  "description": "Dashboard Datadog com volume diário de OS, latência das APIs, tempo médio por status, saúde do Kubernetes e erros de integração.",
+  "layout_type": "ordered",
+  "widgets": [
+    {
+      "definition": {
+        "title": "Volume Diário de Ordens de Serviço",
+        "type": "query_value",
+        "requests": [
+          {
+            "queries": [
+              {
+                "name": "os_criadas",
+                "data_source": "metrics",
+                "query": "sum:oficina.os_criadas_total{*}.as_count()"
+              }
+            ],
+            "response_format": "scalar"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Transições por Status (Diagnóstico, Execução, Finalização)",
+        "type": "timeseries",
+        "requests": [
+          {
+            "queries": [
+              {
+                "name": "transicoes",
+                "data_source": "metrics",
+                "query": "sum:oficina.os_transicoes_total{*} by {status}.as_count()"
+              }
+            ],
+            "display_type": "bars"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Latência das APIs (p50 / p95 / p99)",
+        "type": "timeseries",
+        "requests": [
+          {
+            "queries": [
+              {
+                "name": "p95",
+                "data_source": "metrics",
+                "query": "p95:http.server.requests{application:oficina-mecanica}"
+              },
+              {
+                "name": "p99",
+                "data_source": "metrics",
+                "query": "p99:http.server.requests{application:oficina-mecanica}"
+              }
+            ],
+            "display_type": "line"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Erros e Falhas nas Integrações e OS",
+        "type": "timeseries",
+        "requests": [
+          {
+            "queries": [
+              {
+                "name": "erros_os",
+                "data_source": "metrics",
+                "query": "sum:oficina.os_erros_total{*} by {operacao}.as_count()"
+              },
+              {
+                "name": "erros_notificacao",
+                "data_source": "metrics",
+                "query": "sum:oficina.integracao_notificacao_erros_total{*}.as_count()"
+              }
+            ],
+            "display_type": "bars"
+          }
+        ]
+      }
+    },
+    {
+      "definition": {
+        "title": "Consumo de CPU e Memória Kubernetes",
+        "type": "timeseries",
+        "requests": [
+          {
+            "queries": [
+              {
+                "name": "cpu",
+                "data_source": "metrics",
+                "query": "avg:kubernetes.cpu.usage.total{kube_namespace:oficina*} by {pod_name}"
+              },
+              {
+                "name": "memory",
+                "data_source": "metrics",
+                "query": "avg:kubernetes.memory.working_set{kube_namespace:oficina*} by {pod_name}"
+              }
+            ],
+            "display_type": "line"
+          }
+        ]
+      }
+    }
+  ],
+  "monitors_recomendados": [
+    {
+      "name": "Alerta - Falhas no Processamento de Ordens de Serviço",
+      "type": "metric alert",
+      "query": "sum(last_5m):sum:oficina.os_erros_total{*}.as_count() > 5",
+      "message": "Taxa elevada de falhas ao processar Ordens de Serviço. Verificar logs via correlationId/traceId."
+    },
+    {
+      "name": "Alerta - Falhas de Integração / Notificação",
+      "type": "metric alert",
+      "query": "sum(last_5m):sum:oficina.integracao_notificacao_erros_total{*}.as_count() > 3",
+      "message": "Falhas consecutivas no envio de notificações ou integrações externas."
+    }
+  ]
+}

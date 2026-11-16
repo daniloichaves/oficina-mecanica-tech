@@ -1,21 +1,47 @@
-# Priority 1 - OS Service
+# OS Service (`os-service`)
 
-Este módulo é o primeiro passo prático da Fase 4: um serviço independente de ordem de serviço, com estado e API mínima para evoluir em seguida para cobrança, execução e integração assíncrona.
+Microsserviço responsável pelo ciclo de vida das Ordens de Serviço (abertura, consulta, atualização de status e cancelamento por compensação da Saga).
 
-## Como executar
+## Tecnologias
 
-```bash
-cd fase4-priority1/os-service
-mvn spring-boot:run
+- Java 21 + Spring Boot 3.2.5
+- Spring Data JPA + PostgreSQL (SQL) / H2 (testes locais)
+- RabbitMQ (`spring-boot-starter-amqp`) — publica `os.criada` / `os.status.atualizado` e consome `saga.os.*`
+- SpringDoc OpenAPI (Swagger) + Actuator + Prometheus + Logstash JSON (`X-Correlation-ID`)
+- JUnit 5 + JaCoCo (cobertura mínima de 80%)
+
+## Arquitetura do Serviço
+
+```mermaid
+flowchart LR
+    C[Cliente / Saga Orchestrator] -->|REST :8081| API[OrdemServicoController]
+    API --> SVC[OrdemServicoService]
+    SVC --> DB[(PostgreSQL - osdb)]
+    SVC -->|Publica os.criada| MQ((RabbitMQ))
+    MQ -->|Consome saga.os.*| LST[OsCommandListener]
+    LST --> SVC
 ```
 
-## Endpoints principais
+## Endpoints e Documentação
 
-- `POST /api/os`
-- `GET /api/os/{id}`
-- `GET /api/os`
-- `PATCH /api/os/{id}/status`
+- Swagger UI: `http://localhost:8081/swagger-ui.html`
+- Collection Postman: [`docs/postman/oficina-mecanica-fase4.postman_collection.json`](../../docs/postman/oficina-mecanica-fase4.postman_collection.json)
+- `POST /api/os` — Abrir nova OS
+- `GET /api/os` | `GET /api/os/{id}` | `GET /api/os/status/{status}`
+- `PATCH /api/os/{id}/status` | `PATCH /api/os/{id}/cancelar`
 
-## Observação
+## Execução, Testes e Deploy
 
-O objetivo aqui é manter um MVP funcional e claro, sem tentar construir a arquitetura completa de uma vez.
+```bash
+# Testes + verificação de cobertura JaCoCo >= 80%
+mvn -B clean verify
+
+# Execução local (H2)
+mvn spring-boot:run
+
+# Docker
+docker build -t oficina-os-service .
+
+# Kubernetes
+kubectl apply -f k8s/
+```

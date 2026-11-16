@@ -2,8 +2,10 @@ package com.oficina.mecanica.infrastructure.notification;
 
 import com.oficina.mecanica.domain.entities.OrdemServico;
 import com.oficina.mecanica.domain.repositories.NotificacaoPort;
+import com.oficina.mecanica.infrastructure.observability.OficinaMetrics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
@@ -14,6 +16,9 @@ import org.springframework.stereotype.Component;
 public class EmailNotificacaoAdapter implements NotificacaoPort {
 
     private final JavaMailSender mailSender;
+
+    @Autowired(required = false)
+    private OficinaMetrics oficinaMetrics;
 
     @Override
     public void notificarMudancaStatus(OrdemServico os) {
@@ -27,7 +32,10 @@ public class EmailNotificacaoAdapter implements NotificacaoPort {
                 + " mudou para o status: " + os.getStatus().getDescricao() + ".");
             mailSender.send(msg);
         } catch (Exception e) {
-            // ponytail: best-effort — falha de SMTP não pode abortar a transição de status
+            if (oficinaMetrics != null) {
+                oficinaMetrics.registrarErroNotificacao();
+            }
+            // best-effort — falha de SMTP não pode abortar a transição de status
             log.warn("Falha ao enviar e-mail de notificação da OS {}: {}", os.getId(), e.getMessage());
         }
     }
