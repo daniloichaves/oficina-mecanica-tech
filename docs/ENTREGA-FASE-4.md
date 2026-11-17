@@ -5,7 +5,8 @@
     - Danilo Ischiavolini Chaves — RM372600
     - Rodrigo Dias Bragantini — RM372859
     - William de Oliveira Almeida — RM372192
-- **Vídeo demonstrativo da Fase 4:** _pendente de publicação (YouTube ou Vimeo, até 15 minutos)_
+- **Vídeo demonstrativo da Fase 4:** ensaio publicado no YouTube (13min40s) — https://www.youtube.com/watch?v=ZRiNr2rE-cM
+    - _a versão final, com as evidências revisadas, ainda será regravada e republicada_
 
 ## Visão geral
 
@@ -181,12 +182,23 @@ Implementado nos quatro serviços:
 - `X-Correlation-ID` propagado por filtro HTTP, pelo MDC dos logs, pelas chamadas REST entre serviços e pelo estado persistido da saga
 - Dashboard e monitores Datadog versionados em `docs/observability/datadog-dashboard.json`
 
-> **Pendência:** não há coletor de métricas em execução no `docker-compose.fase4.yml` nem no cluster. A demonstração de monitoramento é feita hoje pelos endpoints Prometheus de cada serviço, pelos logs correlacionados e pela interface de gerenciamento do RabbitMQ.
+### Stack local de monitoramento
+
+O `docker-compose.fase4-observability.yml` sobe Prometheus e Grafana junto dos serviços, com datasource e dashboard provisionados por arquivos versionados em `docs/observability/fase4/`:
+
+```bash
+docker compose -f docker-compose.fase4.yml -f docker-compose.fase4-observability.yml up -d
+```
+
+- Prometheus em `http://localhost:9090`, coletando `/actuator/prometheus` dos quatro serviços a cada 5 segundos
+- Grafana em `http://localhost:3000/d/oficina-fase4`, com disponibilidade, contadores de sagas, requisições de negócio, latência média, erros HTTP, memória e CPU
+
+> **Escopo:** a stack local coleta métricas. O rastreamento entre serviços é feito pelo `X-Correlation-ID` nos logs e no histórico da saga; tracing distribuído com agregação de logs e Datadog ao vivo continua fora do escopo desta entrega.
 
 ## Documentação e collection
 
 - Arquitetura, diagramas, ADRs e contrato de eventos: `docs/architecture/fase4/README.md`
-- Resumo executivo da fase: `docs/fase4/README.md`
+- Dashboard local de métricas: `docs/observability/fase4/README.md`
 - README por microsserviço, com diagrama, endpoints e evidências de cobertura
 - Collection Postman: `docs/postman/oficina-mecanica-fase4.postman_collection.json`, com 11 requisições cobrindo o fluxo completo e a compensação
 - Swagger UI em cada serviço: `http://localhost:<porta>/swagger-ui.html`
@@ -203,13 +215,12 @@ Implementado nos quatro serviços:
 - [x] Testes unitários e BDD com cobertura acima do gate de 80% nos 4 serviços
 - [x] Evidências de cobertura publicadas nos READMEs
 - [x] Dockerfile, Docker Compose, manifestos Kubernetes e pipelines de CI/CD
-- [x] Observabilidade em código e documentação arquitetural com ADRs
+- [x] Observabilidade em código, stack local de Prometheus e Grafana e documentação arquitetural com ADRs
 
 ### Pendências
 
 - [ ] Publicação de cada microsserviço em repositório Git próprio
-- [ ] Gravação e publicação do vídeo de demonstração
-- [ ] Coletor de métricas em execução para a demonstração de monitoramento
+- [ ] Regravação e publicação da versão final do vídeo (o ensaio já está no YouTube)
 - [ ] Envio desta entrega no portal do aluno
 
 ## Conclusão

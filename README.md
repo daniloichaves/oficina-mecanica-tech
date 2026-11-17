@@ -26,7 +26,7 @@ Vimeo: https://vimeo.com/1226680429?share=copy&fl=sv&fe=ci
 
 Demonstração dos microsserviços, Saga com compensação, RabbitMQ e dashboard Grafana/Prometheus. Pagamento e estorno simulados; narração por voz sintética. As evidências de CI/CD, cobertura, Sonar e deploy Kubernetes ainda precisam ser completadas para a entrega final.
 
-[Roteiro da apresentação](docs/fase4/ROTEIRO-VIDEO.md) · [Relatório de validação do ensaio](fase4-video-codex/VALIDACAO.md)
+[Roteiro da apresentação](fase4-video-codex/ROTEIRO-VIDEO.md) · [Relatório de validação do ensaio](fase4-video-codex/VALIDACAO.md)
 
 ## Fase 2 — Objetivos
 
@@ -105,7 +105,7 @@ A Fase 4 evoluiu os protótipos para **4 microsserviços independentes** com ban
 ### Documentação, Observabilidade e Collection Fase 4
 
 - Arquitetura, diagramas e ADRs (Saga Orquestrada & SQL/NoSQL): [`docs/architecture/fase4/README.md`](docs/architecture/fase4/README.md)
-- Resumo executivo: [`docs/fase4/README.md`](docs/fase4/README.md)
+- Dashboard local de métricas (Prometheus + Grafana): [`docs/observability/fase4/README.md`](docs/observability/fase4/README.md)
 - Dashboard e monitores Datadog: [`docs/observability/datadog-dashboard.json`](docs/observability/datadog-dashboard.json)
 - Collection Postman Fase 4: [`docs/postman/oficina-mecanica-fase4.postman_collection.json`](docs/postman/oficina-mecanica-fase4.postman_collection.json)
 
