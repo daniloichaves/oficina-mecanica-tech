@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: oficina-fase4
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: [os-service:8081]
+        labels:
+          application: os-service
+      - targets: [billing-service:8082]
+        labels:
+          application: billing-service
+      - targets: [execution-service:8083]
+        labels:
+          application: execution-service
+      - targets: [saga-orchestrator:8084]
+        labels:
+          application: saga-orchestrator

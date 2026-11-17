@@ -1,0 +1,7 @@
+.env
+node_modules/
+saida/
+.browser-profile/
+*.mp4
+*.wav
+*.mp3

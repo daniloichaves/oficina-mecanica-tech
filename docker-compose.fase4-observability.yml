@@ -1,0 +1,33 @@
+services:
+  prometheus:
+    image: prom/prometheus:v3.4.1
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./docs/observability/fase4/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - fase4-prometheus-data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=7d
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:12.0.2
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: oficina-local
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/oficina-fase4.json
+    volumes:
+      - fase4-grafana-data:/var/lib/grafana
+      - ./docs/observability/fase4/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./docs/observability/fase4/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  fase4-prometheus-data:
+  fase4-grafana-data:

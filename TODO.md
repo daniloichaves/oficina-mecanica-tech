@@ -427,6 +427,15 @@ Elevar a aplicação a um nível de operação corporativa, utilizando práticas
 
 ## FASE 4 - Tech Challenge
 
+### Vídeo de demonstração — ensaio local
+
+- [x] Gerar ensaio narrado de 13min40s com fluxo de sucesso, compensação e dashboard local.
+- [x] Registrar o link informado pelo grupo no README e no TODO: [assistir no YouTube](https://www.youtube.com/watch?v=ZRiNr2rE-cM).
+- [ ] Completar as evidências de CI/CD, cobertura, Sonar e deploy Kubernetes para a versão final.
+- [ ] Incluir o link no PDF de entrega e enviar no portal.
+
+Pagamento e estorno simulados; voz sintética. O ensaio não comprova a integração externa Mercado Pago nem traces APM. Detalhes em [VALIDACAO.md](fase4-video-codex/VALIDACAO.md).
+
 **Peso:** 90% da nota de todas as disciplinas da fase
 
 ### Objetivo
@@ -505,7 +514,8 @@ Refatorar a aplicação para arquitetura de microsserviços com gestão transaci
 - [x] Incluir evidências de cobertura de testes e documentação da arquitetura do serviço
 - [x] Atualizar collection Postman (`docs/postman/oficina-mecanica-fase4.postman_collection.json`) e Swagger (`/swagger-ui.html`)
 - [ ] Publicar repositórios Git separados no GitHub
-- [ ] Upload do vídeo de demonstração no YouTube ou Vimeo (até 15 minutos)
+- [x] Disponibilizar o vídeo de ensaio no YouTube (13min40s): [assistir](https://www.youtube.com/watch?v=ZRiNr2rE-cM)
+- [ ] Completar as evidências pendentes e revisar a versão do vídeo para entrega final
 - [ ] Criar PDF com identificação do grupo, links, arquitetura e estratégia do Saga
 - [ ] Enviar o PDF no portal do aluno dentro do prazo
 
