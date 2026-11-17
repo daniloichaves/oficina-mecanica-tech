@@ -516,7 +516,7 @@ Refatorar a aplicação para arquitetura de microsserviços com gestão transaci
 - [ ] Publicar repositórios Git separados no GitHub
 - [x] Disponibilizar o vídeo de ensaio no YouTube (13min40s): [assistir](https://www.youtube.com/watch?v=ZRiNr2rE-cM)
 - [ ] Completar as evidências pendentes e revisar a versão do vídeo para entrega final
-- [ ] Criar PDF com identificação do grupo, links, arquitetura e estratégia do Saga
+- [x] Criar PDF com identificação do grupo, links, arquitetura e estratégia do Saga (`docs/ENTREGA-FASE-4.md` + `docs/ENTREGA-FASE-4.pdf`)
 - [ ] Enviar o PDF no portal do aluno dentro do prazo
 
 ### Status da Fase 4
