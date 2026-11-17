@@ -45,3 +45,17 @@ docker build -t oficina-os-service .
 # Kubernetes
 kubectl apply -f k8s/
 ```
+
+## Evidências de Cobertura de Testes
+
+Execução de `mvn -B clean verify` em 17/11/2026 — gate JaCoCo (`BUNDLE` / `LINE`) aprovado, build `EXIT=0`.
+
+| Métrica | Resultado | Gate |
+|---------|-----------|------|
+| Cobertura de linhas | **95,7%** (110/115 linhas) | ≥ 80% ✅ |
+| Testes executados | 7 testes | 0 falhas, 0 erros ✅ |
+
+![Relatório JaCoCo — os-service](docs/coverage-jacoco.png)
+
+- Relatório HTML completo: `target/site/jacoco/index.html` (gerado por `mvn clean verify`)
+- Gate executado no pipeline: [CI/CD Microsserviços (Fase 4)](https://github.com/daniloichaves/oficina-mecanica-tech/actions/workflows/fase4-microservices.yml)

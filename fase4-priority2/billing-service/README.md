@@ -44,3 +44,17 @@ mvn spring-boot:run
 docker build -t oficina-billing-service .
 kubectl apply -f k8s/
 ```
+
+## Evidências de Cobertura de Testes
+
+Execução de `mvn -B clean verify` em 17/11/2026 — gate JaCoCo (`BUNDLE` / `LINE`) aprovado, build `EXIT=0`.
+
+| Métrica | Resultado | Gate |
+|---------|-----------|------|
+| Cobertura de linhas | **97,9%** (191/195 linhas) | ≥ 80% ✅ |
+| Testes executados | 5 testes | 0 falhas, 0 erros ✅ |
+
+![Relatório JaCoCo — billing-service](docs/coverage-jacoco.png)
+
+- Relatório HTML completo: `target/site/jacoco/index.html` (gerado por `mvn clean verify`)
+- Gate executado no pipeline: [CI/CD Microsserviços (Fase 4)](https://github.com/daniloichaves/oficina-mecanica-tech/actions/workflows/fase4-microservices.yml)
