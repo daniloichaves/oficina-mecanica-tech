@@ -1,0 +1,142 @@
+services:
+  postgres-os:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: osdb
+      POSTGRES_USER: oficina
+      POSTGRES_PASSWORD: oficina123
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oficina -d osdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-billing:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: billingdb
+      POSTGRES_USER: oficina
+      POSTGRES_PASSWORD: oficina123
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oficina -d billingdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-saga:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: sagadb
+      POSTGRES_USER: oficina
+      POSTGRES_PASSWORD: oficina123
+    ports:
+      - "5435:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oficina -d sagadb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb-execution:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  os-service:
+    build: ./fase4-priority1/os-service
+    ports:
+      - "8081:8081"
+    environment:
+      DB_URL: jdbc:postgresql://postgres-os:5432/osdb
+      DB_DRIVER: org.postgresql.Driver
+      DB_USERNAME: oficina
+      DB_PASSWORD: oficina123
+      RABBITMQ_HOST: rabbitmq
+      APP_MESSAGING_ENABLED: "true"
+      APP_ENVIRONMENT: docker
+    depends_on:
+      postgres-os:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  billing-service:
+    build: ./fase4-priority2/billing-service
+    ports:
+      - "8082:8082"
+    environment:
+      DB_URL: jdbc:postgresql://postgres-billing:5432/billingdb
+      DB_DRIVER: org.postgresql.Driver
+      DB_USERNAME: oficina
+      DB_PASSWORD: oficina123
+      RABBITMQ_HOST: rabbitmq
+      APP_MESSAGING_ENABLED: "true"
+      APP_ENVIRONMENT: docker
+    depends_on:
+      postgres-billing:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  execution-service:
+    build: ./fase4-priority3/execution-service
+    ports:
+      - "8083:8083"
+    environment:
+      MONGODB_URI: mongodb://mongodb-execution:27017/executiondb
+      RABBITMQ_HOST: rabbitmq
+      APP_MESSAGING_ENABLED: "true"
+      APP_ENVIRONMENT: docker
+    depends_on:
+      mongodb-execution:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  saga-orchestrator:
+    build: ./fase4-priority4/saga-orchestrator
+    ports:
+      - "8084:8084"
+    environment:
+      DB_URL: jdbc:postgresql://postgres-saga:5432/sagadb
+      DB_DRIVER: org.postgresql.Driver
+      DB_USERNAME: oficina
+      DB_PASSWORD: oficina123
+      RABBITMQ_HOST: rabbitmq
+      APP_MESSAGING_ENABLED: "true"
+      APP_ORCHESTRATION_REMOTE_ENABLED: "true"
+      OS_SERVICE_URL: http://os-service:8081
+      BILLING_SERVICE_URL: http://billing-service:8082
+      EXECUTION_SERVICE_URL: http://execution-service:8083
+      APP_ENVIRONMENT: docker
+    depends_on:
+      postgres-saga:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      os-service:
+        condition: service_started
+      billing-service:
+        condition: service_started
+      execution-service:
+        condition: service_started

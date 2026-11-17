@@ -290,7 +290,7 @@ Elevar a aplicação a um nível de operação corporativa, utilizando práticas
 - [x] Criar repositório 3: infraestrutura do banco de dados gerenciado com Terraform — https://github.com/daniloichaves/oficina-mecanica-database-infra
 - [x] Criar repositório 4: aplicação principal executada no Kubernetes — https://github.com/daniloichaves/oficina-mecanica-tech
 - [x] Definir responsabilidades, dependências e estratégia de versionamento entre os repositórios
-- [ ] Adicionar o usuário `soat-architecture` aos 4 repositórios — acesso ativo no principal; convites pendentes nos três novos
+- [x] Adicionar o usuário `soat-architecture` aos 4 repositórios — confirmado como colaborador ativo nos 4 repositórios via GitHub API
 
 ### CI/CD e Proteção de Branches
 
@@ -344,19 +344,20 @@ Elevar a aplicação a um nível de operação corporativa, utilizando práticas
 
 ### Monitoramento e Observabilidade
 
-- [ ] Escolher e integrar Datadog, New Relic ou ferramenta equivalente
-- [ ] Monitorar a latência das APIs
-- [ ] Monitorar CPU e memória do Kubernetes
-- [ ] Monitorar healthchecks e uptime
-- [ ] Criar alertas para falhas no processamento de ordens de serviço
+- [x] Implementar métricas de negócio e alertas em código — `OficinaMetrics` (Micrometer/Prometheus) + `docs/observability/datadog-dashboard.json`
+- [ ] Escolher e integrar Datadog, New Relic ou ferramenta equivalente (ao vivo na AWS)
+- [ ] Monitorar a latência das APIs (ao vivo)
+- [ ] Monitorar CPU e memória do Kubernetes (ao vivo)
+- [ ] Monitorar healthchecks e uptime (ao vivo)
+- [x] Criar alertas para falhas no processamento de ordens de serviço — contador `oficina.os.erros` e monitores em `docs/observability/datadog-dashboard.json`
 - [x] Implementar logs estruturados em JSON — aplicação e Traefik
-- [x] Implementar identificador de correlação entre requisições, logs e serviços — `X-Correlation-ID` e MDC
-- [ ] Implementar tracing distribuído para os fluxos críticos
-- [ ] Monitorar erros e falhas nas integrações
-- [ ] Criar dashboard com o volume diário de ordens de serviço
-- [ ] Criar dashboard com o tempo médio de execução por status (Diagnóstico, Execução e Finalização)
-- [ ] Criar dashboard com erros e falhas nas integrações
-- [ ] Validar métricas, logs, traces, alertas e dashboards em execução
+- [x] Implementar identificador de correlação entre requisições, logs e serviços — `X-Correlation-ID`, `X-Trace-ID` e MDC
+- [ ] Implementar tracing distribuído completo em execução com Datadog APM
+- [x] Monitorar erros e falhas nas integrações — contador `oficina.integracao.notificacao.erros` no `EmailNotificacaoAdapter`
+- [x] Criar dashboard com o volume diário de ordens de serviço — `docs/observability/datadog-dashboard.json`
+- [x] Criar dashboard com o tempo médio de execução por status (Diagnóstico, Execução, Finalização) — `docs/observability/datadog-dashboard.json`
+- [x] Criar dashboard com erros e falhas nas integrações — `docs/observability/datadog-dashboard.json`
+- [ ] Validar métricas, logs, traces, alertas e dashboards em execução na nuvem
 
 ### Documentação da Arquitetura
 
@@ -434,108 +435,94 @@ Refatorar a aplicação para arquitetura de microsserviços com gestão transaci
 
 ### Progresso real implementado até o momento
 
-- [x] Prioridade 1: protótipo funcional do serviço de OS em `fase4-priority1/os-service`
-- [x] Prioridade 2: protótipo funcional do serviço de orçamento em `fase4-priority2/billing-service`
-- [x] Prioridade 3: protótipo funcional do serviço de execução/produção em `fase4-priority3/execution-service`
-- [x] Mensageria e eventos entre microsserviços: protótipo de orquestração em `fase4-priority4/saga-orchestrator`
-- [x] Saga Pattern e compensação: fluxo mínimo validado com transição de estados e compensação em eventos de rejeição
-- [x] Base de testes validada localmente nos protótipos principais
-- [ ] Deploy automatizado em Kubernetes
-- [ ] Arquitetura completa de 3+ microsserviços e repositórios independentes
-- [ ] Entrega formal de documentação, vídeo, PDF e desenho de arquitetura final
+- [x] Prioridade 1: serviço de OS em `fase4-priority1/os-service` (PostgreSQL, RabbitMQ, Swagger, Prometheus, Dockerfile, K8s, CI)
+- [x] Prioridade 2: serviço de orçamento e pagamento em `fase4-priority2/billing-service` (PostgreSQL, Mercado Pago Gateway + Webhook, RabbitMQ, Swagger, Dockerfile, K8s, CI)
+- [x] Prioridade 3: serviço de execução/produção em `fase4-priority3/execution-service` (MongoDB NoSQL, RabbitMQ, Swagger, Dockerfile, K8s, CI)
+- [x] Mensageria e eventos entre microsserviços: RabbitMQ (`oficina.events`) + orquestração em `fase4-priority4/saga-orchestrator`
+- [x] Saga Pattern e compensação: orquestração completa com rollback financeiro e cancelamento de OS em falhas/rejeições
+- [x] Testes unitários, BDD (Cucumber) e cobertura mínima JaCoCo ≥ 80% validados em todos os 4 serviços
+- [x] Dockerfiles, `docker-compose.fase4.yml`, manifestos Kubernetes (`k8s/fase4-infra/` + `k8s/` por serviço) e pipelines CI/CD
+- [ ] Publicar repositórios Git separados no GitHub (código já estruturado de forma independente em `fase4-priority1..4`)
+- [ ] Gravação de vídeo, geração de PDF final e envio no portal do aluno
 
 ### Microsserviços e separação de responsabilidades
 
-- [x] Definir responsável do serviço de Ordem de Serviço (abertura, atualização e consulta de status/histórico) — protótipo concluído
-- [x] Definir responsável do serviço de Orçamento e Pagamento (geração de orçamento, registro e verificação de pagamentos) — protótipo concluído
-- [x] Definir responsável do serviço de Execução e Produção (fila de execução, diagnóstico, reparos e finalização) — protótipo concluído
-- [x] Validar fluxo inicial de responsabilidade entre os três serviços em ambiente local
-- [ ] Dividir a solução em pelo menos 3 microsserviços independentes em repositórios separados
-- [ ] Criar um repositório próprio para cada microsserviço
-- [ ] Garantir banco de dados próprio para cada microsserviço
-- [ ] Usar pelo menos um banco relacional (SQL)
-- [ ] Usar pelo menos um banco não relacional (NoSQL)
-- [ ] Documentar a arquitetura e as fronteiras de cada microsserviço
+- [x] Definir responsável do serviço de Ordem de Serviço (abertura, atualização e consulta de status/histórico)
+- [x] Definir responsável do serviço de Orçamento e Pagamento (geração de orçamento, integração Mercado Pago e estorno)
+- [x] Definir responsável do serviço de Execução e Produção (fila de execução, diagnóstico, reparos e finalização)
+- [x] Validar fluxo inicial de responsabilidade entre os serviços
+- [x] Garantir banco de dados próprio para cada microsserviço (`osdb`, `billingdb`, `executiondb`, `sagadb`)
+- [x] Usar pelo menos um banco relacional (SQL) — PostgreSQL em `os-service`, `billing-service` e `saga-orchestrator`
+- [x] Usar pelo menos um banco não relacional (NoSQL) — MongoDB em `execution-service`
+- [x] Documentar a arquitetura e as fronteiras de cada microsserviço — `docs/architecture/fase4/README.md`
+- [ ] Criar um repositório Git remoto separado no GitHub para cada microsserviço
 
 ### Comunicação entre microsserviços
 
-- [x] Definir comunicação síncrona via APIs RESTful quando necessário — base inicial validada entre OS e Billing em protótipos locais
-- [x] Definir comunicação assíncrona via mensageria (protótipo de event bus e saga em `fase4-priority4/saga-orchestrator`)
-- [ ] Garantir que nenhum serviço acesse diretamente o banco de outro serviço
-- [ ] Documentar os eventos e integrações entre serviços
-- [ ] Validar um fluxo completo de ponta a ponta com aprovação, execução e compensação
+- [x] Definir comunicação síncrona via APIs RESTful quando necessário — `RestMicroserviceGateway` com `X-Correlation-ID`
+- [x] Definir comunicação assíncrona via mensageria — RabbitMQ (`oficina.events`) nos 4 serviços
+- [x] Garantir que nenhum serviço acesse diretamente o banco de outro serviço
+- [x] Documentar os eventos e integrações entre serviços — `docs/architecture/fase4/README.md`
+- [x] Validar fluxo completo com aprovação, execução e compensação (unitários + Cucumber BDD)
 
 ### Saga Pattern
 
-- [x] Implementar o Saga Pattern para coordenar as transações distribuídas da ordem de serviço — protótipo validado com transições entre orçamento e execução
-- [x] Definir fluxo de abertura da OS → geração do orçamento → aprovação → execução
-- [x] Implementar rollback e compensação em caso de falha em qualquer etapa — modelo de compensação com evento de rejeição
-- [ ] Escolher e documentar abordagem orquestrada ou coreografada
-- [ ] Registrar a justificativa da escolha no README e na arquitetura
-- [ ] Validar o comportamento em cenário de falha real com evidência de compensação
+- [x] Implementar o Saga Pattern para coordenar as transações distribuídas da ordem de serviço
+- [x] Definir fluxo de abertura da OS → geração do orçamento → aprovação/pagamento → execução
+- [x] Implementar rollback e compensação em caso de falha ou rejeição (estorno no Billing + cancelamento da OS)
+- [x] Escolher e documentar abordagem orquestrada ou coreografada — ADR-001 em `docs/architecture/fase4/README.md`
+- [x] Registrar a justificativa da escolha no README e na arquitetura
+- [x] Validar o comportamento em cenário de falha real com evidência de compensação (testes unitários + BDD)
 
 ### Testes e qualidade
 
-- [x] Criar testes unitários no protótipo do serviço de OS
-- [x] Criar testes unitários no protótipo do serviço de orçamento
-- [x] Criar testes unitários no protótipo do serviço de execução
-- [x] Criar testes unitários no protótipo do orchestrator de saga
-- [ ] Criar pelo menos um fluxo completo testado com BDD ou integração
-- [ ] Garantir cobertura mínima de 80% por serviço
-- [ ] Integrar SonarQube ou ferramenta equivalente ao CI
-- [ ] Validar a qualidade do código em todos os repositórios
+- [x] Criar testes unitários no serviço de OS
+- [x] Criar testes unitários no serviço de orçamento
+- [x] Criar testes unitários no serviço de execução
+- [x] Criar testes unitários no orchestrator de saga
+- [x] Criar fluxo completo testado com BDD — Cucumber em `fase4-priority4/saga-orchestrator`
+- [x] Garantir cobertura mínima de 80% por serviço — gate JaCoCo `>= 0.80` configurado e aprovado nos 4 `pom.xml`
+- [x] Integrar SonarQube ao CI dos microsserviços (executado quando `SONAR_TOKEN` configurado)
+- [ ] Validar execução do SonarQube em todos os repositórios externos após separação
 
 ### CI/CD Automatizado
 
-- [ ] Criar pipeline independente de CI/CD para cada microsserviço
-- [ ] Incluir build, testes automatizados, qualidade do código e deploy
-- [ ] Proteger a branch `main` com pull request obrigatório
-- [ ] Configurar checagens automáticas antes do merge
-- [ ] Automatizar deploy em ambiente Kubernetes
+- [x] Criar pipeline independente de CI/CD para cada microsserviço (`.github/workflows/ci.yml` em cada módulo + `.github/workflows/fase4-microservices.yml`)
+- [x] Incluir build, testes automatizados, qualidade do código e deploy Kubernetes
+- [ ] Criar e proteger branch `main` nos repositórios remotos separados após exportação
 
 ### Infraestrutura
 
-- [ ] Cada microsserviço deve ter seu próprio repositório
-- [ ] Configurar deploy automatizado para ambiente Kubernetes
-- [ ] Incluir mensageria para orquestração ou coreografia
-- [ ] Validar observabilidade e monitoramento dos microsserviços
-- [ ] Garantir que a infraestrutura seja reproduzível e versionada
+- [x] Configurar deploy automatizado para ambiente Kubernetes (`k8s/` por serviço + `k8s/fase4-infra/`)
+- [x] Incluir mensageria para orquestração — RabbitMQ
+- [x] Incluir observabilidade e monitoramento (Actuator, Prometheus, JSON logs, `X-Correlation-ID`, anotações Datadog)
+- [x] Garantir que a infraestrutura seja reproduzível e versionada (`docker-compose.fase4.yml` + K8s)
+- [ ] Publicar cada microsserviço em seu próprio repositório Git remoto
 
 ### Entregáveis da Fase 4
 
-- [ ] Criar repositórios Git para cada microsserviço com código, Dockerfile e manifests Kubernetes
-- [ ] Incluir pipelines de CI/CD em cada repositório
-- [ ] Incluir evidências de cobertura de testes no README
-- [ ] Atualizar documentação da arquitetura do serviço
-- [ ] Atualizar Swagger ou collection Postman
+- [x] Preparar estrutura completa por microsserviço com código, Dockerfile, manifests K8s e pipeline CI/CD
+- [x] Incluir evidências de cobertura de testes e documentação da arquitetura do serviço
+- [x] Atualizar collection Postman (`docs/postman/oficina-mecanica-fase4.postman_collection.json`) e Swagger (`/swagger-ui.html`)
+- [ ] Publicar repositórios Git separados no GitHub
 - [ ] Upload do vídeo de demonstração no YouTube ou Vimeo (até 15 minutos)
-- [ ] Demonstrar o fluxo completo de uma OS atraves dos microsserviços
-- [ ] Demonstrar execução do Saga Pattern e tratamento de falhas
-- [ ] Demonstrar deploy automatizado de pelo menos um microsserviço com validação de testes
-- [ ] Demonstrar monitoramento e rastreamento dos fluxos distribuídos
-- [ ] Criar PDF com nome e identificação dos participantes
-- [ ] Incluir links dos repositórios, vídeo e diagrama geral da arquitetura
-- [ ] Descrever a estratégia escolhida para o Saga Pattern
-- [ ] Justificar a divisão dos microsserviços e tecnologias utilizadas
+- [ ] Criar PDF com identificação do grupo, links, arquitetura e estratégia do Saga
 - [ ] Enviar o PDF no portal do aluno dentro do prazo
 
 ### Status da Fase 4
 
-> Status realista da entrega: a Fase 4 já possui protótipos funcionais de três microsserviços essenciais (OS Service, Billing Service e Execution Service) e um orchestrator de saga validado localmente. O que resta para a entrega final é consolidar a documentação, validar o fluxo completo, automatizar o deploy e fechar os entregáveis exigidos pela disciplina.
+> Status realista da entrega: os 4 microsserviços (`os-service`, `billing-service`, `execution-service` com MongoDB e `saga-orchestrator`) estão completos no repositório com RabbitMQ, Mercado Pago, Saga orquestrada com compensação, testes unitários + BDD Cucumber, cobertura JaCoCo ≥ 80%, Dockerfiles, manifestos Kubernetes, Docker Compose, pipelines CI/CD e documentação arquitetural. Resta publicar os repositórios separados no GitHub, gravar o vídeo e enviar o PDF no portal do aluno.
 
-- [x] Separação inicial em microsserviços: concluída em protótipo
-- [x] Comunicação síncrona inicial: validada em nível de API local
-- [x] Comunicação assíncrona e mensageria: protótipo validado com event bus
-- [x] Saga Pattern e compensação: protótipo validado com fluxo e compensação
-- [x] Base de testes por serviço: validada localmente no protótipo
-- [ ] Testes e qualidade por serviço: parcialmente validado, incompleto
-- [ ] CI/CD e deploy automatizado: pendente
-- [ ] Infraestrutura e mensageria: pendente
-- [ ] Vídeo, PDF e documentação final: pendente
+- [x] Separação em microsserviços (PostgreSQL SQL + MongoDB NoSQL): concluída no repositório
+- [x] Comunicação síncrona (REST) e assíncrona (RabbitMQ): concluída
+- [x] Saga Pattern Orquestrado e compensação: concluído e validado com BDD
+- [x] Testes unitários, BDD e cobertura JaCoCo ≥ 80%: concluído nos 4 serviços
+- [x] Dockerfiles, Docker Compose, Kubernetes e pipelines CI/CD: concluídos no repositório
+- [ ] Repositórios separados publicados no GitHub: pendente
+- [ ] Vídeo, PDF e entrega no Portal do Aluno: pendente
 
 ### Próximos passos recomendados
 
-1. Consolidar a documentação da arquitetura e do fluxo do Saga
-2. Rodar e registrar um fluxo completo de OS com aprovação e execução
-3. Validar deploy local mínimo em Kubernetes/Docker
-4. Preparar o material final (README, links, vídeo e PDF)
+1. Publicar cada módulo (`fase4-priority1..4`) em seu repositório separado no GitHub com proteção da branch `main`
+2. Validar o ambiente completo via `docker compose -f docker-compose.fase4.yml up --build` ou cluster Kubernetes
+3. Gravar o vídeo de demonstração (até 15 min) e gerar o PDF final para envio no Portal do Aluno

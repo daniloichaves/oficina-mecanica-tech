@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: os-service
+  namespace: oficina-fase4
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: os-service
+  template:
+    metadata:
+      labels:
+        app: os-service
+      annotations:
+        ad.datadoghq.com/os-service.logs: '[{"source":"java","service":"os-service"}]'
+        ad.datadoghq.com/os-service.checks: '{"openmetrics":{"instances":[{"openmetrics_endpoint":"http://%%host%%:8081/actuator/prometheus","namespace":"oficina_os","metrics":[".*"]}]}}'
+    spec:
+      containers:
+        - name: os-service
+          image: ghcr.io/daniloichaves/oficina-os-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          env:
+            - name: DB_URL
+              value: jdbc:postgresql://postgres-os:5432/osdb
+            - name: DB_DRIVER
+              value: org.postgresql.Driver
+            - name: DB_USERNAME
+              value: oficina
+            - name: DB_PASSWORD
+              value: oficina123
+            - name: RABBITMQ_HOST
+              value: rabbitmq
+            - name: APP_MESSAGING_ENABLED
+              value: "true"
+          resources:
+            requests:
+              cpu: 200m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8081
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8081
+            initialDelaySeconds: 40
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: os-service
+  namespace: oficina-fase4
+spec:
+  selector:
+    app: os-service
+  ports:
+    - port: 8081
+      targetPort: 8081
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: os-service-hpa
+  namespace: oficina-fase4
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: os-service
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

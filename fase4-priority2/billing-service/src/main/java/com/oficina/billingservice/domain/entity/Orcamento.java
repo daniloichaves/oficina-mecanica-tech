@@ -34,6 +34,12 @@ public class Orcamento {
     @Column(nullable = false)
     private StatusOrcamento status;
 
+    private String paymentId;
+
+    private String paymentStatus;
+
+    private String paymentProvider;
+
     @Column(nullable = false)
     private LocalDateTime dataCriacao;
 
@@ -74,5 +80,14 @@ public class Orcamento {
             throw new IllegalStateException("Só é possível pagar um orçamento aprovado");
         }
         this.status = StatusOrcamento.PAGO;
+    }
+
+    public void compensar() {
+        if (this.status == StatusOrcamento.PAGO) {
+            this.status = StatusOrcamento.ESTORNADO;
+            this.paymentStatus = "refunded";
+        } else if (this.status == StatusOrcamento.PENDENTE || this.status == StatusOrcamento.APROVADO) {
+            this.status = StatusOrcamento.REJEITADO;
+        }
     }
 }

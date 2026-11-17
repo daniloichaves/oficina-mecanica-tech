@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: saga-orchestrator
+  namespace: oficina-fase4
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: saga-orchestrator
+  template:
+    metadata:
+      labels:
+        app: saga-orchestrator
+      annotations:
+        ad.datadoghq.com/saga-orchestrator.logs: '[{"source":"java","service":"saga-orchestrator"}]'
+        ad.datadoghq.com/saga-orchestrator.checks: '{"openmetrics":{"instances":[{"openmetrics_endpoint":"http://%%host%%:8084/actuator/prometheus","namespace":"oficina_saga","metrics":[".*"]}]}}'
+    spec:
+      containers:
+        - name: saga-orchestrator
+          image: ghcr.io/daniloichaves/oficina-saga-orchestrator:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8084
+          env:
+            - name: DB_URL
+              value: jdbc:postgresql://postgres-saga:5432/sagadb
+            - name: DB_DRIVER
+              value: org.postgresql.Driver
+            - name: DB_USERNAME
+              value: oficina
+            - name: DB_PASSWORD
+              value: oficina123
+            - name: RABBITMQ_HOST
+              value: rabbitmq
+            - name: APP_MESSAGING_ENABLED
+              value: "true"
+            - name: APP_ORCHESTRATION_REMOTE_ENABLED
+              value: "true"
+            - name: OS_SERVICE_URL
+              value: http://os-service:8081
+            - name: BILLING_SERVICE_URL
+              value: http://billing-service:8082
+            - name: EXECUTION_SERVICE_URL
+              value: http://execution-service:8083
+          resources:
+            requests:
+              cpu: 200m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8084
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8084
+            initialDelaySeconds: 40
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: saga-orchestrator
+  namespace: oficina-fase4
+spec:
+  selector:
+    app: saga-orchestrator
+  ports:
+    - port: 8084
+      targetPort: 8084
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: saga-orchestrator-hpa
+  namespace: oficina-fase4
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: saga-orchestrator
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

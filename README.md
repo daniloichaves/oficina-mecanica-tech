@@ -85,67 +85,42 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:30080/api/clientes
 O login legado inseguro (`POST /api/auth/login`) está desativado por padrão e pode ser
 habilitado somente para compatibilidade local com `LEGACY_AUTH_ENABLED=true`.
 
-## Fase 4 — Progresso inicial em microsserviços
+## Fase 4 — Arquitetura de Microsserviços e Saga
 
-A Fase 4 foi iniciada com uma estratégia incremental e realista: primeiro validamos o
-serviço de OS e depois o serviço de orçamento em protótipos independentes, antes de
-avançar para a composição distribuída completa.
+A Fase 4 evoluiu os protótipos para **4 microsserviços independentes** com bancos de dados próprios (**PostgreSQL SQL** e **MongoDB NoSQL**), mensageria **RabbitMQ**, integração de pagamento **Mercado Pago**, **Saga Pattern Orquestrado**, testes unitários + **BDD (Cucumber)** com gate **JaCoCo ≥ 80%**, `Dockerfile`, manifestos Kubernetes, Docker Compose e pipelines CI/CD:
 
-### Estado atual da implementação
-- ✅ Prioridade 1: `fase4-priority1/os-service` — protótipo funcional com criação, consulta e atualização de status da ordem de serviço.
-- ✅ Prioridade 2: `fase4-priority2/billing-service` — protótipo funcional para criação, aprovação, rejeição e pagamento de orçamentos.
-- ✅ Prioridade 3: `fase4-priority3/execution-service` — protótipo funcional para criação, início, finalização e entrega da execução da ordem.
-- ✅ Prioridade 4: `fase4-priority4/saga-orchestrator` — protótipo funcional de mensageria e saga com transição de estados e compensação.
-- ⚠️ Ainda pendente: deploy automatizado e arquitetura completa de 3+ microsserviços com repositórios independentes, além do fechamento final com CI/CD e observabilidade distribuída.
+- **Prioridade 1:** [`fase4-priority1/os-service`](fase4-priority1/os-service/) — PostgreSQL (SQL), RabbitMQ, Swagger, Prometheus/JSON logs (`:8081`)
+- **Prioridade 2:** [`fase4-priority2/billing-service`](fase4-priority2/billing-service/) — PostgreSQL (SQL), Mercado Pago Gateway + Webhook, RabbitMQ (`:8082`)
+- **Prioridade 3:** [`fase4-priority3/execution-service`](fase4-priority3/execution-service/) — **MongoDB (NoSQL)**, RabbitMQ, ciclo de execução/entrega/cancelamento (`:8083`)
+- **Prioridade 4:** [`fase4-priority4/saga-orchestrator`](fase4-priority4/saga-orchestrator/) — PostgreSQL (SQL), orquestração REST + RabbitMQ, compensação automática e **BDD Cucumber** (`:8084`)
 
-### Evidência validada localmente
-- `mvn test -q` em `fase4-priority1/os-service` executou com sucesso.
-- `mvn test -q && echo 'BILLING_SERVICE_TESTS_OK'` em `fase4-priority2/billing-service` executou com sucesso;
-  o terminal retornou `BILLING_SERVICE_TESTS_OK`.
-- `mvn test -q && echo 'EXECUTION_SERVICE_TESTS_OK'` em `fase4-priority3/execution-service` executou com sucesso;
-  o terminal retornou `EXECUTION_SERVICE_TESTS_OK`.
-- `mvn test -q && echo 'SAGA_ORCHESTRATOR_TESTS_OK'` em `fase4-priority4/saga-orchestrator` executou com sucesso;
-  o terminal retornou `SAGA_ORCHESTRATOR_TESTS_OK`.
+### Documentação, Observabilidade e Collection Fase 4
 
-### Documentação executiva do Fase 4
+- Arquitetura, diagramas e ADRs (Saga Orquestrada & SQL/NoSQL): [`docs/architecture/fase4/README.md`](docs/architecture/fase4/README.md)
+- Resumo executivo: [`docs/fase4/README.md`](docs/fase4/README.md)
+- Dashboard e monitores Datadog: [`docs/observability/datadog-dashboard.json`](docs/observability/datadog-dashboard.json)
+- Collection Postman Fase 4: [`docs/postman/oficina-mecanica-fase4.postman_collection.json`](docs/postman/oficina-mecanica-fase4.postman_collection.json)
 
-Resumo executivo e roteiro de apresentação:
-- [`docs/fase4/README.md`](docs/fase4/README.md)
+### Execução Completa com Docker Compose (SQL + NoSQL + RabbitMQ)
 
-### Execução local do MVP Fase 4
+```bash
+docker compose -f docker-compose.fase4.yml up --build -d
+```
 
-Para subir todos os protótipos do Fase 4 em modo local, use os scripts da raiz do projeto:
-
+Ou para subir os módulos localmente em modo desenvolvimento:
 ```bash
 chmod +x run-fase4-local.sh stop-fase4-local.sh
 ./run-fase4-local.sh
 ```
 
-Isso inicia os serviços nas portas:
-- 8081 — OS Service
-- 8082 — Billing Service
-- 8083 — Execution Service
-- 8084 — Saga Orchestrator
-
-Validação de fluxo executada em runtime:
+### Validação de Testes e Cobertura (JaCoCo ≥ 80% + BDD)
 
 ```bash
-curl -i -X POST http://localhost:8081/api/os \
-  -H 'Content-Type: application/json' \
-  -d '{"placaVeiculo":"ABC1234","clienteId":"cli-1","nomeCliente":"Joao","descricaoDefeito":"Freio travado"}'
-
-curl -i -X POST http://localhost:8082/api/orcamentos \
-  -H 'Content-Type: application/json' \
-  -d '{"ordemId":1,"clienteId":"cli-1","valor":1500.00}'
-
-curl -i -X POST http://localhost:8083/api/execucoes \
-  -H 'Content-Type: application/json' \
-  -d '{"ordemId":1,"clienteId":"cli-1","descricaoTarefa":"Troca de pastilhas"}'
-
-curl -i -X POST http://localhost:8084/api/sagas/ordens/1/iniciar
+mvn -B -f fase4-priority1/os-service/pom.xml clean verify
+mvn -B -f fase4-priority2/billing-service/pom.xml clean verify
+mvn -B -f fase4-priority3/execution-service/pom.xml clean verify
+mvn -B -f fase4-priority4/saga-orchestrator/pom.xml clean verify
 ```
-
-> Com esse setup, o fluxo do protótipo Fase 4 foi validado em runtime sem falha de startup ao iniciar o módulo correto.
 ### Decisões de arquitetura (Fase 2)
 
 - **Hexagonal pragmática:** os ports de repositório/notificação vivem em `domain/repositories`; os adapters (Spring Data JPA, SMTP) na infraestrutura. As entidades de domínio mantêm anotações JPA — tradeoff consciente de MVP para não duplicar o modelo; documentado nos próprios ports.

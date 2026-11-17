@@ -1,25 +1,40 @@
-# Priority 3 - Execution Service
+# Execution Service (`execution-service`)
 
-Este módulo representa a terceira etapa da Fase 4: um protótipo do serviço de execução/produção, responsável por acompanhar a etapa operacional da ordem de serviço.
+Microsserviço responsável pela fila operacional de diagnóstico, reparo, finalização e entrega de veículos, persistindo documentos em banco **NoSQL (MongoDB)**.
 
-## Como executar
+## Tecnologias
 
-```bash
-cd fase4-priority3/execution-service
-mvn spring-boot:run
+- Java 21 + Spring Boot 3.2.5
+- Spring Data **MongoDB** (NoSQL — `@Document(collection = "execucoes")`)
+- RabbitMQ (`spring-boot-starter-amqp`) — publica `execucao.criada`, `execucao.iniciada`, `execucao.finalizada`, `execucao.entregue`, `execucao.cancelada`
+- SpringDoc OpenAPI (Swagger) + Actuator + Prometheus + Logstash JSON (`X-Correlation-ID`)
+- JUnit 5 + Mockito + JaCoCo (cobertura mínima de 80%)
+
+## Arquitetura do Serviço
+
+```mermaid
+flowchart LR
+    C[Operador / Saga Orchestrator] -->|REST :8083| API[ExecucaoController]
+    API --> SVC[ExecucaoService]
+    SVC --> DB[(MongoDB NoSQL - executiondb)]
+    SVC -->|Publica execucao.*| MQ((RabbitMQ))
 ```
 
-## Endpoints principais
+## Endpoints e Documentação
 
-- `POST /api/execucoes`
-- `GET /api/execucoes`
-- `GET /api/execucoes/{id}`
-- `GET /api/execucoes/ordem/{ordemId}`
-- `PATCH /api/execucoes/{id}/iniciar`
-- `PATCH /api/execucoes/{id}/status`
-- `PATCH /api/execucoes/{id}/finalizar`
-- `PATCH /api/execucoes/{id}/entregar`
+- Swagger UI: `http://localhost:8083/swagger-ui.html`
+- Collection Postman: [`docs/postman/oficina-mecanica-fase4.postman_collection.json`](../../docs/postman/oficina-mecanica-fase4.postman_collection.json)
+- `POST /api/execucoes` — Criar item na fila de execução
+- `GET /api/execucoes` | `GET /api/execucoes/{id}` | `GET /api/execucoes/ordem/{ordemId}`
+- `PATCH /api/execucoes/{id}/iniciar` | `/status` | `/finalizar` | `/entregar` | `/cancelar`
 
-## Observação
+## Execução, Testes e Deploy
 
-Esse serviço é um ponto de partida para a cadeia distribuída da Fase 4, antes da introdução de mensageria, compensação e integração completa com OS Service e Billing Service.
+```bash
+# Testes + verificação de cobertura JaCoCo >= 80%
+mvn -B clean verify
+
+# Docker & Kubernetes
+docker build -t oficina-execution-service .
+kubectl apply -f k8s/
+```

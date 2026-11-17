@@ -6,7 +6,10 @@ import com.oficina.osservice.domain.entity.OrdemServico;
 import com.oficina.osservice.domain.entity.StatusOrdemServico;
 import com.oficina.osservice.infrastructure.event.OsEventPublisher;
 import com.oficina.osservice.infrastructure.persistence.OrdemServicoRepository;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,9 @@ public class OrdemServicoService {
     private final OrdemServicoRepository repository;
     private final OsEventPublisher osEventPublisher;
 
+    @Autowired(required = false)
+    private MeterRegistry meterRegistry;
+
     public OrdemServico criar(CriarOrdemServicoRequest request) {
         OrdemServico ordem = OrdemServico.builder()
                 .clienteId(request.clienteId())
@@ -30,6 +36,7 @@ public class OrdemServicoService {
                 .build();
 
         OrdemServico salvo = repository.save(ordem);
+        incrementCounter("os.service.criadas", "status", salvo.getStatus().name());
         osEventPublisher.publishStatusChanged(String.valueOf(salvo.getId()), salvo.getStatus());
         return salvo;
     }
@@ -45,11 +52,35 @@ public class OrdemServicoService {
         return repository.findAll();
     }
 
+    @Transactional(readOnly = true)
+    public List<OrdemServico> buscarPorStatus(StatusOrdemServico status) {
+        return repository.findByStatus(status);
+    }
+
     public OrdemServico atualizarStatus(Long id, AtualizarStatusRequest request) {
         OrdemServico ordem = buscarPorId(id);
         ordem.setStatus(request.status());
         OrdemServico salvo = repository.save(ordem);
+        incrementCounter("os.service.transicoes", "status", salvo.getStatus().name());
         osEventPublisher.publishStatusChanged(String.valueOf(salvo.getId()), salvo.getStatus());
         return salvo;
+    }
+
+    public OrdemServico cancelar(Long id) {
+        OrdemServico ordem = buscarPorId(id);
+        if (ordem.getStatus() == StatusOrdemServico.ENTREGUE) {
+            throw new IllegalStateException("Não é possível cancelar uma ordem já entregue");
+        }
+        ordem.setStatus(StatusOrdemServico.CANCELADA);
+        OrdemServico salvo = repository.save(ordem);
+        incrementCounter("os.service.canceladas", "status", salvo.getStatus().name());
+        osEventPublisher.publishStatusChanged(String.valueOf(salvo.getId()), salvo.getStatus());
+        return salvo;
+    }
+
+    private void incrementCounter(String name, String tagKey, String tagValue) {
+        if (meterRegistry != null) {
+            Counter.builder(name).tag(tagKey, tagValue).register(meterRegistry).increment();
+        }
     }
 }
