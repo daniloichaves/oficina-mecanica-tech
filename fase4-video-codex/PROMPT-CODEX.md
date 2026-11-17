@@ -1,0 +1,13 @@
+# Cole este prompt no Codex aberto dentro da pasta fase4-video-codex
+
+Leia integralmente `ROTEIRO-VIDEO.md`, `AGENTS.md`, `README.md` e `docs/MAPA-CENAS.md`. Este repositório contém o roteiro real da Fase 4 de uma oficina mecânica com quatro microsserviços, Saga Pattern, RabbitMQ, Grafana e Prometheus.
+
+**Meta:** preparar e executar no Windows um vídeo narrado em pt-BR de 13 cenas (13m40s previstos, máximo 15m), usando Playwright na interface Swagger UI e nos dashboards, FFmpeg gdigrab para capturar a tela e voz local do Windows ou voz neural configurada no `.env` local. Respeite exatamente a ordem e os fatos do roteiro: leia somente "Falar" e realize "Mostrar". Não transforme a apresentação em tutorial de download OpenAPI.
+
+Primeiro execute `npm run syntax`, `npm test`, `npm run plan`, `npm run check`, `npm run inspect`, sem executar POST/PATCH. Corrija no código os seletores com base no HTML e OpenAPI REAL de cada localhost. Veja especialmente o tipo de entrada do `POST /api/sagas/ordens/{ordemId}/eventos`, que atualmente assume um parâmetro `evento`; não faça mutações até validar se ele é query, body ou form. Confirme no Grafana Last 15 minutes e refresh 5s, e os quatro targets UP no Prometheus. Garanta leitura dos IDs reais OS_A, ORC_A, EXEC_A (UUID), OS_B e ORC_B, além de esperas e reconsultas nos eventos assíncronos. Execute somente os métodos aprovados no roteiro.
+
+Use `VIDEO_MODE=ensaio` enquanto não houver evidências reais para a cena 12. Os arquivos feature e workflow não comprovam testes, JaCoCo, Sonar ou Kubernetes; não os apresente como comprovados. Não remova o bloqueio do modo final apenas para obter um vídeo. Para a entrega final, obtenha evidências verdadeiras e verificáveis, automatize a apresentação do commit no GitHub Actions, cobertura medida dos quatro serviços, Sonar e rollout/imagem Kubernetes; se não existirem, declare bloqueio.
+
+Não revele nem copie o conteúdo do `.env`; não exponha senhas, tokens ou dados pessoais no vídeo. Os painéis exigem login local, porém não solicite credenciais no chat. Preserve o aviso de limitação sobre duas execuções criadas por OS, tarefas não canceladas, pagamentos/estornos simulados e APM não comprovado. Se qualquer serviço falhar, pare e informe erro; não simule resultados.
+
+Peça autorização antes de alterar dados fora da base de demonstração. O opt-in técnico é `ALLOW_DEMO_MUTATIONS=true`, que deve ser configurado explicitamente pelo dono do ambiente. Só depois da validação inicie `npm run video`. Verifique o MP4, duração <=15:00, legibilidade, áudio e coerência visual. Forneça lista de pendências reais se a entrega final estiver bloqueada.

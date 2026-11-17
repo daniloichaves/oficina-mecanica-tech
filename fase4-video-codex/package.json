@@ -1,0 +1,23 @@
+{
+  "name": "fase4-video-codex",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Automação de vídeo Fase 4 baseada no roteiro original: Saga, Swagger, métricas e evidências.",
+  "scripts": {
+    "plan": "node src/plan.mjs",
+    "check": "node src/check.mjs",
+    "inspect": "node src/inspect.mjs",
+    "validate-ui": "node src/validate-ui.mjs",
+    "resume": "node src/resume.mjs",
+    "video": "node src/record.mjs",
+    "voices": "powershell -NoProfile -ExecutionPolicy Bypass -File src/voices.ps1",
+    "syntax": "node --check src/script.mjs && node --check src/swagger.mjs && node --check src/plan.mjs && node --check src/inspect.mjs && node --check src/record.mjs && node --check src/check.mjs && node --check src/validate-ui.mjs && node --check src/resume.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "openai": "^5.0.0",
+    "playwright": "^1.56.0"
+  }
+}

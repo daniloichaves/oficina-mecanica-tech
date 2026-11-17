@@ -20,6 +20,14 @@ Vimeo: https://vimeo.com/1226680429?share=copy&fl=sv&fe=ci
 
 
 
+**Vídeo demonstrativo da Fase 4 — ensaio local (13min40s):**
+
+[Assistir à demonstração no YouTube](https://www.youtube.com/watch?v=ZRiNr2rE-cM)
+
+Demonstração dos microsserviços, Saga com compensação, RabbitMQ e dashboard Grafana/Prometheus. Pagamento e estorno simulados; narração por voz sintética. As evidências de CI/CD, cobertura, Sonar e deploy Kubernetes ainda precisam ser completadas para a entrega final.
+
+[Roteiro da apresentação](docs/fase4/ROTEIRO-VIDEO.md) · [Relatório de validação do ensaio](fase4-video-codex/VALIDACAO.md)
+
 ## Fase 2 — Objetivos
 
 Evolução da aplicação da Fase 1 para garantir **qualidade, resiliência e escalabilidade**:
